@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#0F0F1A">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>BAA Quiz — NOVA IMS</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+  :root {
+    --bg: #0F0F1A;
+    --surface: #1A1A2E;
+    --surface2: #22223A;
+    --border: rgba(255,255,255,0.10);
+    --border2: rgba(255,255,255,0.18);
+    --text: #F0F0F8;
+    --muted: #8A8AB0;
+    --accent: #7F77DD;
+    --accent-soft: #2A2845;
+    --green: #4CAF7D;
+    --green-soft: #0D2B1A;
+    --red: #E05C6A;
+    --red-soft: #2B0D12;
+    --amber: #F0A840;
+    --amber-soft: #2B1D00;
+    --radius: 14px;
+    --radius-sm: 8px;
+    --font: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  }
+
+  html, body { height: 100%; background: var(--bg); color: var(--text); font-family: var(--font); font-size: 16px; line-height: 1.5; overflow-x: hidden; }
+
+  /* ─── Layout ─── */
+  #app { max-width: 480px; margin: 0 auto; min-height: 100dvh; display: flex; flex-direction: column; }
+  .screen { display: none; flex-direction: column; flex: 1; padding: 20px 16px 32px; }
+  .screen.active { display: flex; }
+
+  /* ─── Typography ─── */
+  h1 { font-size: 26px; font-weight: 700; letter-spacing: -0.5px; }
+  h2 { font-size: 20px; font-weight: 600; letter-spacing: -0.3px; }
+  h3 { font-size: 15px; font-weight: 600; }
+  .label { font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+  .muted { color: var(--muted); font-size: 13px; }
+
+  /* ─── Buttons ─── */
+  button { font-family: var(--font); cursor: pointer; border: none; background: none; color: inherit; }
+  .btn-primary { width: 100%; padding: 16px; font-size: 16px; font-weight: 600; background: var(--accent); color: #fff; border-radius: var(--radius); letter-spacing: -0.2px; transition: opacity .15s, transform .1s; }
+  .btn-primary:active { opacity: .85; transform: scale(0.98); }
+  .btn-ghost { width: 100%; padding: 14px; font-size: 15px; font-weight: 500; border: 1px solid var(--border2); border-radius: var(--radius); color: var(--text); transition: background .15s; }
+  .btn-ghost:active { background: var(--surface2); }
+  .btn-icon { width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; border-radius: 10px; background: var(--surface2); border: 1px solid var(--border); }
+
+  /* ─── Cards ─── */
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; }
+
+  /* ─── HOME SCREEN ─── */
+  .home-wordmark { margin-bottom: 4px; }
+  .home-wordmark span { font-size: 12px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent); }
+  .home-title { font-size: 28px; font-weight: 800; letter-spacing: -1px; line-height: 1.1; margin-bottom: 6px; }
+  .home-sub { color: var(--muted); font-size: 14px; margin-bottom: 28px; }
+
+  .stat-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 28px; }
+  .stat-box { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 12px 8px; text-align: center; }
+  .stat-n { font-size: 22px; font-weight: 700; color: var(--accent); }
+  .stat-l { font-size: 11px; color: var(--muted); margin-top: 2px; }
+
+  .mode-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 20px; }
+  .mode-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 12px; cursor: pointer; transition: border-color .15s, background .15s; text-align: left; }
+  .mode-card:active { background: var(--surface2); }
+  .mode-card.sel { border-color: var(--accent); background: var(--accent-soft); }
+  .mode-icon { font-size: 20px; margin-bottom: 6px; }
+  .mode-name { font-size: 14px; font-weight: 600; color: var(--text); }
+  .mode-desc { font-size: 12px; color: var(--muted); margin-top: 2px; }
+
+  .section-pills { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 20px; }
+  .pill { padding: 6px 12px; border-radius: 999px; font-size: 12px; font-weight: 500; border: 1px solid var(--border2); color: var(--muted); cursor: pointer; transition: all .15s; }
+  .pill.sel { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+  .scores-section { margin-top: 24px; }
+  .score-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--border); font-size: 13px; }
+  .score-row:last-child { border-bottom: none; }
+
+  /* ─── QUIZ SCREEN ─── */
+  .quiz-top { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; }
+  .progress-track { flex: 1; height: 4px; background: var(--surface2); border-radius: 2px; overflow: hidden; }
+  .progress-fill { height: 100%; background: var(--accent); border-radius: 2px; transition: width .4s cubic-bezier(.4,0,.2,1); }
+  .q-count { font-size: 13px; color: var(--muted); white-space: nowrap; font-weight: 500; }
+
+  .hud { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 16px; }
+  .hud-box { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 10px 6px; text-align: center; }
+  .hud-n { font-size: 18px; font-weight: 700; color: var(--text); }
+  .hud-l { font-size: 10px; color: var(--muted); margin-top: 1px; font-weight: 500; letter-spacing: 0.04em; text-transform: uppercase; }
+
+  .q-meta { display: flex; gap: 6px; margin-bottom: 12px; flex-wrap: wrap; }
+  .chip { font-size: 11px; font-weight: 600; padding: 4px 9px; border-radius: 999px; letter-spacing: 0.03em; }
+  .chip-easy { background: var(--green-soft); color: var(--green); }
+  .chip-medium { background: var(--amber-soft); color: var(--amber); }
+  .chip-hard { background: var(--red-soft); color: var(--red); }
+  .chip-type { background: var(--accent-soft); color: var(--accent); }
+  .chip-section { background: var(--surface2); color: var(--muted); }
+
+  .q-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 18px 16px; margin-bottom: 16px; }
+  .q-text { font-size: 16px; line-height: 1.55; font-weight: 500; color: var(--text); }
+
+  .opts-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px; }
+  .opt { width: 100%; text-align: left; padding: 14px 16px; border: 1px solid var(--border2); border-radius: var(--radius-sm); background: var(--surface); font-size: 14px; line-height: 1.4; color: var(--text); transition: border-color .12s, background .12s; font-family: var(--font); }
+  .opt:active { background: var(--surface2); }
+  .opt.selected { border-color: var(--accent); background: var(--accent-soft); }
+  .opt.correct { border-color: var(--green); background: var(--green-soft); color: var(--green); }
+  .opt.wrong { border-color: var(--red); background: var(--red-soft); color: var(--red); }
+  .opt.disabled { pointer-events: none; }
+
+  .tf-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px; }
+  .tf-btn { padding: 20px 10px; font-size: 17px; font-weight: 700; border: 1px solid var(--border2); border-radius: var(--radius); background: var(--surface); color: var(--text); transition: all .12s; }
+  .tf-btn:active { background: var(--surface2); }
+  .tf-btn.correct { border-color: var(--green); background: var(--green-soft); color: var(--green); }
+  .tf-btn.wrong { border-color: var(--red); background: var(--red-soft); color: var(--red); }
+  .tf-btn.disabled { pointer-events: none; }
+
+  .multi-hint { font-size: 12px; color: var(--muted); padding: 8px 12px; background: var(--surface2); border-radius: var(--radius-sm); margin-bottom: 8px; }
+
+  .feedback { padding: 14px 16px; border-radius: var(--radius-sm); margin-bottom: 14px; font-size: 14px; line-height: 1.55; }
+  .feedback.ok { background: var(--green-soft); border: 1px solid rgba(76,175,125,0.25); color: #a0e8c0; }
+  .feedback.bad { background: var(--red-soft); border: 1px solid rgba(224,92,106,0.25); color: #f0a0a8; }
+  .feedback-title { font-weight: 700; font-size: 15px; margin-bottom: 6px; color: var(--text); }
+  .feedback-ans { font-weight: 600; margin-bottom: 4px; }
+
+  /* ─── RESULTS SCREEN ─── */
+  .results-hero { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 28px 20px; text-align: center; margin-bottom: 16px; }
+  .results-grade { font-size: 72px; font-weight: 800; color: var(--accent); line-height: 1; letter-spacing: -2px; }
+  .results-sub { font-size: 15px; color: var(--muted); margin-top: 8px; }
+  .results-msg { font-size: 16px; font-weight: 600; color: var(--text); margin-top: 10px; }
+
+  .results-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 20px; }
+  .r-box { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 14px 10px; text-align: center; }
+  .r-n { font-size: 22px; font-weight: 700; color: var(--text); }
+  .r-l { font-size: 11px; color: var(--muted); margin-top: 2px; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600; }
+
+  .review-item { border: 1px solid var(--border); border-radius: var(--radius-sm); margin-bottom: 8px; overflow: hidden; }
+  .review-head { padding: 12px 14px; cursor: pointer; display: flex; align-items: flex-start; gap: 10px; background: var(--surface); }
+  .r-icon { width: 22px; height: 22px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; flex-shrink: 0; margin-top: 1px; }
+  .r-ok { background: var(--green-soft); color: var(--green); }
+  .r-bad { background: var(--red-soft); color: var(--red); }
+  .r-qtext { font-size: 13px; line-height: 1.4; flex: 1; color: var(--text); }
+  .review-body { display: none; padding: 12px 14px; background: var(--surface2); border-top: 1px solid var(--border); font-size: 12px; color: var(--muted); line-height: 1.6; }
+  .review-body.open { display: block; }
+  .review-correct { font-weight: 600; color: var(--green); margin-bottom: 4px; }
+  .review-your { color: var(--red); margin-bottom: 4px; }
+
+  .action-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 16px; }
+
+  /* ─── Quit overlay ─── */
+  .overlay-wrap { position: fixed; inset: 0; background: rgba(0,0,0,0.7); display: none; align-items: center; justify-content: center; z-index: 100; padding: 20px; }
+  .overlay-wrap.show { display: flex; }
+  .overlay-box { background: var(--surface); border: 1px solid var(--border2); border-radius: var(--radius); padding: 24px 20px; width: 100%; max-width: 320px; text-align: center; }
+  .overlay-box h3 { margin-bottom: 8px; }
+  .overlay-box p { color: var(--muted); font-size: 14px; margin-bottom: 20px; }
+  .overlay-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+  /* ─── Streak toast ─── */
+  .toast { position: fixed; top: 24px; left: 50%; transform: translateX(-50%); background: var(--accent); color: #fff; font-size: 14px; font-weight: 600; padding: 10px 20px; border-radius: 999px; opacity: 0; pointer-events: none; transition: opacity .3s; z-index: 200; white-space: nowrap; }
+  .toast.show { opacity: 1; }
+
+  /* ─── Scrollable areas ─── */
+  .scroll-area { overflow-y: auto; flex: 1; }
+  .gap { height: 12px; }
+  .gap-lg { height: 20px; }
+</style>
+</head>
+<body>
+<div id="app">
+
+  <!-- HOME -->
+  <div class="screen active" id="home">
+    <div class="home-wordmark"><span>NOVA IMS · Pedro Ferreira</span></div>
+    <div class="home-title">Business AI Architectures</div>
+    <div class="home-sub">131 exam questions · All 5 sessions covered</div>
+
+    <div class="stat-row">
+      <div class="stat-box"><div class="stat-n">131</div><div class="stat-l">Questions</div></div>
+      <div class="stat-box"><div class="stat-n">8</div><div class="stat-l">Sections</div></div>
+      <div class="stat-box"><div class="stat-n">3</div><div class="stat-l">Types</div></div>
+    </div>
+
+    <div class="label" style="margin-bottom:10px">Play mode</div>
+    <div class="mode-grid" id="mode-grid">
+      <div class="mode-card sel" data-mode="all" onclick="selectMode(this)">
+        <div class="mode-icon">📚</div>
+        <div class="mode-name">Full exam</div>
+        <div class="mode-desc">All 131 questions</div>
+      </div>
+      <div class="mode-card" data-mode="quick" onclick="selectMode(this)">
+        <div class="mode-icon">⚡</div>
+        <div class="mode-name">Quick drill</div>
+        <div class="mode-desc">20 random questions</div>
+      </div>
+      <div class="mode-card" data-mode="hard" onclick="selectMode(this)">
+        <div class="mode-icon">🔥</div>
+        <div class="mode-name">Hard only</div>
+        <div class="mode-desc">Challenge mode</div>
+      </div>
+      <div class="mode-card" data-mode="section" onclick="selectMode(this)">
+        <div class="mode-icon">🎯</div>
+        <div class="mode-name">By section</div>
+        <div class="mode-desc">Pick your chapter</div>
+      </div>
+    </div>
+
+    <div id="section-picker" style="display:none">
+      <div class="label" style="margin-bottom:10px">Choose sections</div>
+      <div class="section-pills" id="section-pills"></div>
+    </div>
+
+    <button class="btn-primary" onclick="startGame()">▶  Start quiz</button>
+
+    <div id="scores-wrap" class="scores-section"></div>
+  </div>
+
+  <!-- QUIZ -->
+  <div class="screen" id="quiz">
+    <div class="quiz-top">
+      <button class="btn-icon" onclick="confirmQuit()" aria-label="Quit quiz" style="flex-shrink:0">✕</button>
+      <div class="progress-track"><div class="progress-fill" id="prog" style="width:0%"></div></div>
+      <div class="q-count" id="q-count">0 / 0</div>
+    </div>
+
+    <div class="hud">
+      <div class="hud-box"><div class="hud-n" id="hud-score">0</div><div class="hud-l">Score</div></div>
+      <div class="hud-box"><div class="hud-n" id="hud-streak">0</div><div class="hud-l">Streak</div></div>
+      <div class="hud-box"><div class="hud-n" id="hud-left">0</div><div class="hud-l">Left</div></div>
+    </div>
+
+    <div class="q-meta" id="q-meta"></div>
+    <div class="q-card"><div class="q-text" id="q-text"></div></div>
+    <div id="answer-area"></div>
+    <div id="feedback-area"></div>
+    <div id="next-area"></div>
+  </div>
+
+  <!-- RESULTS -->
+  <div class="screen" id="results">
+    <div class="results-hero">
+      <div class="results-grade" id="r-grade">A</div>
+      <div class="results-sub" id="r-sub">0 / 0 correct</div>
+      <div class="results-msg" id="r-msg"></div>
+    </div>
+    <div class="results-grid">
+      <div class="r-box"><div class="r-n" id="r-correct">0</div><div class="r-l">Correct</div></div>
+      <div class="r-box"><div class="r-n" id="r-wrong">0</div><div class="r-l">Wrong</div></div>
+      <div class="r-box"><div class="r-n" id="r-streak">0</div><div class="r-l">Best streak</div></div>
+      <div class="r-box"><div class="r-n" id="r-pct">0%</div><div class="r-l">Accuracy</div></div>
+    </div>
+
+    <div class="label" style="margin-bottom:10px">Review answers</div>
+    <div class="scroll-area" id="review-list"></div>
+
+    <div class="action-row">
+      <button class="btn-ghost" onclick="show('home')">← Menu</button>
+      <button class="btn-primary" onclick="startGame()">Play again</button>
+    </div>
+  </div>
+</div>
+
+<!-- Quit overlay -->
+<div class="overlay-wrap" id="quit-overlay">
+  <div class="overlay-box">
+    <h3>Quit quiz?</h3>
+    <p>Your progress will be lost.</p>
+    <div class="overlay-row">
+      <button class="btn-ghost" onclick="closeQuit()">Keep going</button>
+      <button class="btn-primary" onclick="doQuit()">Quit</button>
+    </div>
+  </div>
+</div>
+
+<!-- Streak toast -->
+<div class="toast" id="toast"></div>
+
+<script>
+const SECTIONS = {
+  A:"Foundations & Architecture", B:"Transformers & LLMs", C:"RAG",
+  D:"MCP & AI Agents", E:"A2A & Frameworks", F:"Research & Reasoning",
+  G:"Business AI & AGI", G2:"Extended: Foundations", G3:"Extended: Agents",
+  H:"Cross-chapter Synthesis"
+};
+
+const Q = [
+  {s:"A",d:"Easy",t:"TF",q:"At the enterprise level, AI is fundamentally a tool for improving human decision-making at speed and scale.",a:"TRUE",e:"The course defines enterprise AI as a discipline that automates and augments decisions through improving predictions, automation, and resource optimisation."},
+  {s:"A",d:"Easy",t:"TF",q:"Deep Learning is a broader field than Machine Learning.",a:"FALSE",e:"Deep Learning is a subset of Machine Learning (DL ⊂ ML ⊂ AI). ML is the subset of AI; DL is a subset of ML."},
+  {s:"A",d:"Medium",t:"TF",q:"Automation and AI are the same thing — both script steps and add context to decisions.",a:"FALSE",e:"Automation scripts steps; AI adds context — explaining intent, suggesting actions, and compressing the time from data to decision."},
+  {s:"A",d:"Medium",t:"TF",q:"The Source-to-Pay process is one of the nine cross-functional process flows in the enterprise AI architecture.",a:"TRUE",e:"The nine flows include Lead-to-Cash, Source-to-Pay, Hire-to-Retire, Record-to-Report, Design-to-Build, Forecast-to-Fulfill, Request-to-Service, Invoice-to-Pay, and Issue-to-Resolution."},
+  {s:"A",d:"Hard",t:"TF",q:"SAP Joule is an example of an Artificial General Intelligence system deployed in enterprise environments.",a:"FALSE",e:"SAP Joule is ANI — task-specific AI embedded across SAP's suite. AGI does not yet exist in deployed commercial systems."},
+  {s:"A",d:"Easy",t:"MCQ",q:"In the course's AI stack analogy, what do AI models represent?",o:["A) Passengers","B) Gates and vehicles","C) Aircraft","D) Air traffic control"],a:"C",e:"Data = passengers, AI models = aircraft, tools & protocols = gates/vehicles, orchestration = air traffic control."},
+  {s:"A",d:"Easy",t:"MCQ",q:"Which Nobel Prize category recognised AlphaFold's protein structure prediction in 2024?",o:["A) Physics","B) Medicine","C) Chemistry","D) Computer Science"],a:"C",e:"The 2024 Nobel in Chemistry went to AlphaFold. Physics went to Hopfield and Hinton for neural network foundations."},
+  {s:"A",d:"Medium",t:"MCQ",q:"Bloomberg Intelligence projected the generative AI market would reach what value by 2032?",o:["A) $500 billion at 20% CAGR","B) $1.3 trillion at 42% CAGR","C) $800 billion at 35% CAGR","D) $2 trillion at 50% CAGR"],a:"B",e:"$1.3 trillion by 2032 at 42% CAGR was the Bloomberg Intelligence projection from Chapter 1."},
+  {s:"A",d:"Medium",t:"MCQ",q:"Which best describes the difference between ANI and AGI?",o:["A) ANI uses neural networks; AGI uses rule-based systems","B) ANI is task-specific; AGI learns any intellectual task and transfers knowledge across domains","C) ANI requires cloud compute; AGI runs on edge devices","D) ANI is supervised; AGI is unsupervised"],a:"B",e:"ANI = narrow, task-specific (e.g. Siri, ChatGPT). AGI = human-level continuous learning and cross-domain knowledge transfer."},
+  {s:"A",d:"Hard",t:"MCQ",q:"The enterprise AI architecture diagram covers how many functional modules?",o:["A) 4","B) 5","C) 6","D) 9"],a:"C",e:"Six modules: Financial, Supply Chain, Procurement, Customer Relationship, HR, and Sustainability. Nine is the number of cross-functional flows."},
+  {s:"A",d:"Hard",t:"MCQ",q:"Which statement best describes the ML function Y = f(X)?",o:["A) Y is the model architecture; X is training data volume","B) Y is predicted output; X is input features; f is learned from data","C) Y is the loss function; X is the gradient; f is the optimiser","D) Y is embedding dimension; X is tokeniser vocabulary"],a:"B",e:"Y = predicted output, X = input features, f = function learned from training data."},
+  {s:"A",d:"Medium",t:"MULTI",q:"Which are among the nine cross-functional process flows? (Select ALL that apply)",o:["A) Lead-to-Cash","B) Design-to-Automate","C) Hire-to-Retire","D) Source-to-Pay","E) Data-to-Decision"],a:"A, C, D",e:"The nine flows include Lead-to-Cash, Source-to-Pay, and Hire-to-Retire. 'Design-to-Automate' and 'Data-to-Decision' are not among them."},
+  {s:"A",d:"Hard",t:"MULTI",q:"Which are TRUE about the three stages of AI maturity? (Select ALL that apply)",o:["A) ANI is task-specific and includes current ChatGPT systems","B) AGI has been achieved by several leading AI labs as of 2026","C) ASI surpasses human intelligence across all domains","D) AGI requires human-level continuous learning","E) ASI is a prerequisite for AGI"],a:"A, C, D",e:"A (ANI = narrow), C (ASI = surpasses humans), D (AGI = continuous learning) are correct. B is false. E is backwards — AGI precedes ASI."},
+  {s:"B",d:"Easy",t:"TF",q:"The paper 'Attention Is All You Need' was published in 2017 and introduced the transformer architecture.",a:"TRUE",e:"Vaswani et al. (2017) replaced recurrence with self-attention, enabling full parallelisation and founding all modern LLMs."},
+  {s:"B",d:"Easy",t:"TF",q:"BERT is a decoder-only transformer model.",a:"FALSE",e:"BERT is encoder-only (understanding/classification). GPT is decoder-only (text generation)."},
+  {s:"B",d:"Medium",t:"TF",q:"Tokenisation in modern LLMs always splits text into individual characters.",a:"FALSE",e:"Modern LLMs use sub-word tokenisation (BPE, SentencePiece), not character-level splitting."},
+  {s:"B",d:"Medium",t:"TF",q:"LoRA reduces trainable parameters by approximately 10,000× compared to full fine-tuning.",a:"TRUE",e:"LoRA injects small low-rank matrices (rank r ≪ d), reducing parameter count by roughly 10,000× vs full fine-tuning."},
+  {s:"B",d:"Hard",t:"TF",q:"In a transformer's embedding space, semantic similarity is captured by geometric proximity.",a:"TRUE",e:"Embedding space maps words to vectors where geometric distance encodes semantic similarity — enabling king − man + woman ≈ queen."},
+  {s:"B",d:"Hard",t:"TF",q:"Bahdanau Attention (2014) introduced full self-attention, making recurrent networks unnecessary.",a:"FALSE",e:"Bahdanau Attention added selective weighting within RNN/seq2seq architectures. Full self-attention came with the 2017 Transformer paper."},
+  {s:"B",d:"Easy",t:"MCQ",q:"What does 'encoder-only' vs 'decoder-only' mean in transformer models?",o:["A) How many layers the model has","B) Which component of the attention mechanism is active","C) Whether the model is suited for understanding (encoder) or generation (decoder)","D) Whether it was trained on text or images"],a:"C",e:"Encoder-only (BERT) excels at understanding. Decoder-only (GPT) generates text auto-regressively."},
+  {s:"B",d:"Medium",t:"MCQ",q:"What is the primary advantage of transformers over RNNs?",o:["A) Transformers require less training data","B) Transformers enable full parallelisation by replacing recurrence with self-attention","C) Transformers have fewer parameters","D) Transformers do not require tokenisation"],a:"B",e:"Replacing recurrence with self-attention enables tokens to be processed in parallel."},
+  {s:"B",d:"Medium",t:"MCQ",q:"Which technique produced word vectors where king − man + woman ≈ queen?",o:["A) N-gram models","B) Bahdanau Attention","C) Word2vec","D) GANs"],a:"C",e:"Word2vec produced dense embeddings where vector arithmetic captures semantic relationships."},
+  {s:"B",d:"Hard",t:"MCQ",q:"In the 8-component deployment framework for LLMs, what comes between Retrieval and Generation?",o:["A) Chunking","B) Embedding","C) Re-ranking","D) Indexing"],a:"C",e:"Pipeline: Ingestion → Pre-processing → Embedding → Indexing → Query processing → Retrieval → Re-ranking → Generation."},
+  {s:"B",d:"Hard",t:"MCQ",q:"What is the enterprise significance of token cost in LLM deployments?",o:["A) More tokens always produce better answers","B) Token count determines API billing and context window constraints — a core design variable","C) Tokens only matter for image generation models","D) Token cost only applies during training, not inference"],a:"B",e:"Token count drives API costs and competes for limited context window space. Chunking, system prompt length, and retrieval precision must all be designed around the token budget."},
+  {s:"B",d:"Medium",t:"MULTI",q:"Which are TRUE about LoRA fine-tuning? (Select ALL that apply)",o:["A) It injects small trainable matrices into existing model layers","B) It requires retraining all model parameters","C) It reduces trainable parameters by roughly 10,000×","D) It is suitable for domain-specific adaptation","E) It replaces the attention mechanism entirely"],a:"A, C, D",e:"A, C, D are correct. B is false (no full retraining). E is false (does not replace attention)."},
+  {s:"B",d:"Hard",t:"MULTI",q:"Which are correct about transformer embedding spaces? (Select ALL that apply)",o:["A) The embedding space is language-independent — translation can occur geometrically","B) Semantic similarity is encoded as cosine distance or dot product","C) Embeddings are binary vectors (0 or 1 per dimension)","D) Words with similar meanings cluster together in vector space","E) Embedding dimension cannot be changed after training"],a:"A, B, D",e:"A, B, D are correct. C is false — embeddings are dense float vectors. E is false — models can be adapted."},
+  {s:"C",d:"Easy",t:"TF",q:"RAG stands for Retrieval-Augmented Generation.",a:"TRUE",e:"RAG retrieves relevant document chunks at inference time and augments the LLM's prompt, grounding generation in verifiable external knowledge."},
+  {s:"C",d:"Easy",t:"TF",q:"In Naive RAG, a cross-encoder re-ranker is always applied before generation.",a:"FALSE",e:"Naive RAG retrieves top-k chunks by vector similarity and passes them directly to the LLM. Re-ranking is a separate, more advanced variant."},
+  {s:"C",d:"Medium",t:"TF",q:"Graph RAG uses graph traversal, making it superior for relational reasoning across entities.",a:"TRUE",e:"Graph RAG builds a knowledge graph and retrieves via traversal, excelling at relational queries requiring multiple JOINs in SQL."},
+  {s:"C",d:"Medium",t:"TF",q:"Chunking strategy is less important than model size for RAG retrieval quality.",a:"FALSE",e:"Chunking strategy — size, overlap, and boundaries — determines retrieval quality more than any other single factor, including model size."},
+  {s:"C",d:"Hard",t:"TF",q:"Re-ranking typically improves RAG pipeline accuracy by 10–30%.",a:"TRUE",e:"A cross-encoder re-ranker applied after initial vector retrieval typically improves accuracy by 10–30%."},
+  {s:"C",d:"Hard",t:"TF",q:"Memory-Augmented RAG stores prior conversation turns for coherent multi-session interactions.",a:"TRUE",e:"Memory-Augmented RAG maintains past interaction logs and retrieved chunks, supporting continuity across sessions."},
+  {s:"C",d:"Easy",t:"MCQ",q:"What is the primary purpose of chunking in a RAG pipeline?",o:["A) To train the embedding model","B) To split documents into segments that fit context limits and are retrievable by similarity","C) To compress the LLM's parameters","D) To translate documents into the model's training language"],a:"B",e:"Chunking splits large documents into manageable segments that fit the context window and can be indexed and retrieved."},
+  {s:"C",d:"Medium",t:"MCQ",q:"Which RAG variant is best for questions requiring a chain of evidence across multiple documents?",o:["A) Naive RAG","B) Contextual Compression RAG","C) Multi-Hop RAG","D) Streaming RAG"],a:"C",e:"Multi-Hop RAG chains multiple retrieval steps where each answer informs the next query."},
+  {s:"C",d:"Medium",t:"MCQ",q:"What does 'Hybrid Retrieval' RAG combine?",o:["A) Fine-tuning and RAG","B) BM25 keyword search and dense vector search","C) Two different LLMs for generation","D) Graph traversal and image search"],a:"B",e:"Hybrid Retrieval RAG combines BM25 (sparse, keyword-based) with dense vector search, catching both exact-match and semantic-match cases."},
+  {s:"C",d:"Hard",t:"MCQ",q:"Which re-ranker is cited as a hosted solution in the course?",o:["A) FAISS","B) Cohere Rerank","C) OpenSearch","D) ChromaDB"],a:"B",e:"Cohere Rerank is the hosted option; NV RerankQA is the open model alternative."},
+  {s:"C",d:"Hard",t:"MCQ",q:"'Access-controlled retrieval' means:",o:["A) Encrypting all chunks at rest","B) Only retrieving chunks the requesting user is authorised to see","C) Rate-limiting chunks retrieved per query","D) Requiring 2FA before retrieval"],a:"B",e:"Access-controlled retrieval ensures the retrieval layer enforces data permissions — users can only receive answers from documents they are authorised to view."},
+  {s:"C",d:"Medium",t:"MULTI",q:"Which are among the nine RAG variants in Chapter 6? (Select ALL that apply)",o:["A) Naive RAG","B) Federated RAG","C) Graph RAG","D) Agentic RAG","E) Quantum RAG"],a:"A, C, D",e:"The nine: Naive, Query Optimisation, Re-Ranking, Contextual Compression, Multi-Hop, Graph, Agentic, Hybrid, Memory-Augmented. Federated and Quantum are not among them."},
+  {s:"C",d:"Hard",t:"MULTI",q:"Which are valid reasons to use RAG over full fine-tuning? (Select ALL that apply)",o:["A) RAG grounds generation in verifiable, citable sources","B) RAG bypasses the model's knowledge cutoff with current data at inference time","C) RAG requires no document ingestion pipeline","D) RAG reduces hallucination by anchoring responses to retrieved context","E) RAG is always cheaper than fine-tuning at any scale"],a:"A, B, D",e:"A (citation), B (bypassing cutoff), D (reducing hallucination) are valid. C is false — RAG requires an ingestion pipeline. E is not universally true."},
+  {s:"D",d:"Easy",t:"TF",q:"A foundation model can directly log into enterprise systems and execute business processes autonomously.",a:"FALSE",e:"Foundation models are passive — they predict the best next response. Without an agent layer and tools, they cannot act in external systems."},
+  {s:"D",d:"Easy",t:"TF",q:"MCP (Model Context Protocol) provides a standardised way for AI models to connect to and use external tools.",a:"TRUE",e:"MCP is analogous to USB for hardware — a universal protocol enabling any model to talk to any tool without bespoke integrations."},
+  {s:"D",d:"Medium",t:"TF",q:"AI Agents differ from Foundation Models in that agents pursue goals through multi-step workflows, while FMs only respond to single prompts.",a:"TRUE",e:"The core distinction: passive (single-turn, responds to prompts) vs operational (multi-step, pursues goals) intelligence."},
+  {s:"D",d:"Medium",t:"TF",q:"Graph databases are preferred over relational DBs for agentic memory because they handle complex relationship traversal more efficiently.",a:"TRUE",e:"Queries needing multiple SQL JOINs are a single graph traversal — critical for real-time agentic decision making."},
+  {s:"D",d:"Hard",t:"TF",q:"Human-in-the-loop (HITL) means the AI executes autonomously and the human reviews a summary afterwards.",a:"FALSE",e:"HITL = human approves every action. AI-in-the-loop (AITL) = AI executes autonomously, human reviews summary."},
+  {s:"D",d:"Hard",t:"TF",q:"Procedural memory in an agent system stores learned action sequences — how to do things.",a:"TRUE",e:"The four memory types: in-context, episodic (past interactions), semantic (facts/graph), and procedural (learned action sequences)."},
+  {s:"D",d:"Easy",t:"MCQ",q:"What does an AI Agent's 'tool use' capability enable?",o:["A) Training on larger datasets","B) Executing real actions in external systems like CRMs, calendars, or databases","C) Generating longer text outputs","D) Using multiple language models simultaneously"],a:"B",e:"Tool use enables the agent to take actions in external systems, moving from generating content to completing tasks."},
+  {s:"D",d:"Medium",t:"MCQ",q:"What is the correct order of the 5-component agent loop?",o:["A) Reason → Perceive → Decide → Execute → Goal-set","B) Perceive → Reason → Goal-set → Decide → Execute","C) Execute → Decide → Goal-set → Reason → Perceive","D) Goal-set → Perceive → Reason → Execute → Decide"],a:"B",e:"Agent loop: Perceive → Reason → Goal-set → Decide → Execute → repeat."},
+  {s:"D",d:"Medium",t:"MCQ",q:"In the churn reduction example, what does the agent do that the foundation model cannot?",o:["A) Generate more ideas","B) Pull the CRM, identify at-risk accounts, schedule outreach, and log actions autonomously","C) Answer in a different language","D) Use a larger context window"],a:"B",e:"The FM produces ideas; the agent takes action — pulling CRM data, identifying accounts, scheduling outreach — without step-by-step human instruction."},
+  {s:"D",d:"Hard",t:"MCQ",q:"Which type of agent memory stores facts and knowledge in a graph structure?",o:["A) Episodic","B) Procedural","C) In-context","D) Semantic"],a:"D",e:"Semantic memory stores facts, concepts, and their relationships — typically as a knowledge graph."},
+  {s:"D",d:"Hard",t:"MCQ",q:"What is the best analogy for MCP in the context of hardware?",o:["A) HDMI cable","B) USB standard","C) Ethernet protocol","D) BIOS firmware"],a:"B",e:"MCP is analogous to USB — a universal protocol so any model can connect to any tool without bespoke integrations."},
+  {s:"D",d:"Medium",t:"MULTI",q:"Which are TRUE differences between a Foundation Model and an AI Agent? (Select ALL that apply)",o:["A) Agents can maintain memory across interactions; FMs have no memory by default","B) FMs generate content; agents complete tasks","C) Agents always require more parameters than foundation models","D) FMs pursue goals; agents respond to prompts","E) Agents can access tools and external systems; FMs cannot without an agent layer"],a:"A, B, E",e:"A (memory), B (content vs tasks), E (system access) are correct. C is false. D has FM/agent roles reversed."},
+  {s:"D",d:"Hard",t:"MULTI",q:"Which are cited types of agent memory in Chapter 8? (Select ALL that apply)",o:["A) In-context memory","B) Episodic memory","C) Semantic memory","D) Temporal memory","E) Procedural memory"],a:"A, B, C, E",e:"The four types: In-context, Episodic, Semantic, and Procedural. 'Temporal memory' is not defined in the course."},
+  {s:"E",d:"Easy",t:"TF",q:"A2A protocol enables agents to discover, delegate to, and coordinate with other specialised agents.",a:"TRUE",e:"A2A solves the coordination problem for multi-agent enterprise deployments."},
+  {s:"E",d:"Easy",t:"TF",q:"MCP and A2A are competing, mutually exclusive protocols.",a:"FALSE",e:"MCP = model-to-tool; A2A = agent-to-agent. They are complementary, not competing."},
+  {s:"E",d:"Medium",t:"TF",q:"Agent Cards in A2A are JSON-LD descriptors advertising an agent's capabilities, input/output schemas, and trust requirements.",a:"TRUE",e:"Agent Cards are the 'business card' of A2A — machine-readable descriptors enabling agent discovery without manual configuration."},
+  {s:"E",d:"Medium",t:"TF",q:"LangGraph and LangChain are the same framework with different names.",a:"FALSE",e:"LangChain = compositional chains and tool use. LangGraph = adds stateful graph execution for cyclic workflows. They are distinct."},
+  {s:"E",d:"Hard",t:"TF",q:"CrewAI organises agents in role-based teams with a Crew → Agents → Tasks hierarchy.",a:"TRUE",e:"CrewAI structures agents as Crew → Agents → Tasks, well-suited for process automation with clear division of labour."},
+  {s:"E",d:"Hard",t:"TF",q:"In A2A, emergent behaviour is desirable and should not be monitored.",a:"FALSE",e:"Emergent behaviour in multi-agent systems is a risk factor requiring comprehensive logging and periodic human review."},
+  {s:"E",d:"Easy",t:"MCQ",q:"What are the three core pillars of Agentic AI?",o:["A) Data ingestion, model training, and inference","B) Autonomous planning, tool use, and reflection & adaptability","C) Tokenisation, embedding, and generation","D) Perception, memory, and retrieval"],a:"B",e:"Three pillars: Autonomous planning (decomposes goals), Tool use (executes real actions), and Reflection & adaptability (revises plans)."},
+  {s:"E",d:"Medium",t:"MCQ",q:"Which agentic framework is best for production enterprise deployments in the Microsoft ecosystem?",o:["A) CrewAI","B) LlamaIndex","C) Semantic Kernel","D) LangChain4j"],a:"C",e:"Semantic Kernel is Microsoft's enterprise-grade .NET/Python SDK with native Azure and OpenAI integration."},
+  {s:"E",d:"Medium",t:"MCQ",q:"The A2A specification has three layers. What are they?",o:["A) Data model → Operations → Protocol bindings","B) Ingestion → Retrieval → Generation","C) Perception → Planning → Execution","D) Discovery → Authentication → Execution"],a:"A",e:"A2A 3-layer spec: Data model (task, result, error types) → Operations (create, update, cancel, status) → Protocol bindings (HTTP/REST, gRPC, WebSocket)."},
+  {s:"E",d:"Hard",t:"MCQ",q:"Which framework is 'data-centric, excelling at connecting agents to structured and unstructured data sources'?",o:["A) AutoGen","B) Semantic Kernel","C) LlamaIndex","D) LangChain4j"],a:"C",e:"LlamaIndex is data-centric and optimal for RAG-heavy agentic applications."},
+  {s:"E",d:"Hard",t:"MCQ",q:"The A2A protocol was standardised in approximately what year?",o:["A) 2020","B) 2022","C) 2023","D) 2025"],a:"D",e:"The course traces 1950s multi-agent research → 2020s LLM-powered agents → 2025 A2A standardisation."},
+  {s:"E",d:"Medium",t:"MULTI",q:"Which are among the six key goals of the A2A protocol? (Select ALL that apply)",o:["A) Discoverability","B) Delegation","C) Profitability","D) Interoperability","E) Observability"],a:"A, B, D, E",e:"The six goals: Discoverability, Delegation, Trust, Observability, Interoperability, Fault tolerance. 'Profitability' is not among them."},
+  {s:"E",d:"Hard",t:"MULTI",q:"Which are cited as risks of A2A multi-agent systems? (Select ALL that apply)",o:["A) Emergent behaviour producing unintended outcomes","B) Increased security surface area with each agent-to-agent call","C) Inability to ever attribute responsibility for actions","D) Governance challenges around audit trails","E) Workforce disruption from automated cognitive tasks"],a:"A, B, D, E",e:"A, B, D, E are cited risks. C is overstated — attribution is difficult but not impossible, which is why audit trails are critical."},
+  {s:"F",d:"Easy",t:"TF",q:"A Large Reasoning Model (LRM) is simply a larger version of a standard LLM.",a:"FALSE",e:"LRMs have a fundamentally different inference architecture — an explicit deliberative 'thinking layer' between input and output."},
+  {s:"F",d:"Easy",t:"TF",q:"Chain-of-Thought prompting asks the model to show reasoning steps before giving a final answer.",a:"TRUE",e:"CoT dramatically improves performance on multi-step logic, maths, and planning tasks."},
+  {s:"F",d:"Medium",t:"TF",q:"The Perplexity-style research architecture uses an agentic loop as its primary retrieval mechanism.",a:"FALSE",e:"Perplexity-style is retrieval-first: retrieve then generate. ChatGPT-style uses the agentic loop."},
+  {s:"F",d:"Medium",t:"TF",q:"In LRM training, RL rewards models for correct final answers AND coherent intermediate reasoning steps.",a:"TRUE",e:"The key RL innovation: rewarding both final answer quality and coherence of the reasoning chain — teaching genuine deliberation."},
+  {s:"F",d:"Hard",t:"TF",q:"Apple's research suggests that LRM accuracy improves linearly with problem complexity.",a:"FALSE",e:"Apple research found accuracy collapse at high complexity — beyond a threshold, LRM performance drops sharply."},
+  {s:"F",d:"Hard",t:"TF",q:"Uncertainty quantification is one of the six defining criteria for a 'research-grade' AI system.",a:"TRUE",e:"The six criteria: Multi-step reasoning, Source attribution, Self-evaluation, Dynamic retrieval, Tool orchestration, Uncertainty quantification."},
+  {s:"F",d:"Easy",t:"MCQ",q:"What is the key difference between an LLM and an LRM?",o:["A) LLMs are cloud-based; LRMs run on-premise","B) LRMs add an explicit deliberative thinking layer between input and output","C) LRMs use RAG; LLMs do not","D) LLMs are more expensive to run than LRMs"],a:"B",e:"LRMs add a deliberative 'thinking layer' — generating and verifying a chain of thought before producing a final answer."},
+  {s:"F",d:"Medium",t:"MCQ",q:"What does 'inference-time compute' mean in the context of LRMs?",o:["A) GPU cost of training from scratch","B) Compute spent generating thinking tokens before answering","C) Cost of tokenising the input query","D) Number of parameters loaded at startup"],a:"B",e:"LRMs spend additional compute at response time — generating internal reasoning chains. Hard problems get more thinking tokens."},
+  {s:"F",d:"Medium",t:"MCQ",q:"The enterprise cascade pattern routes queries in what order?",o:["A) Largest model first, then smaller models for retries","B) Fast/cheap model first, escalating to more capable models for harder queries","C) All queries go to the same model regardless of complexity","D) Models are selected randomly to distribute load"],a:"B",e:"The cascade (GPT-4o mini → GPT-4o → o3-mini) matches compute to complexity: simple queries hit fast cheap models, complex ones escalate."},
+  {s:"F",d:"Hard",t:"MCQ",q:"Which is NOT one of the seven building blocks of a research-grade AI system?",o:["A) Multi-agent systems","B) Evaluation and verification layer","C) Federated learning module","D) Planning layer"],a:"C",e:"The seven: Foundation model, Planning layer, RAG, Tool use, Memory systems, Multi-agent systems, Evaluation & verification. 'Federated learning module' is not among them."},
+  {s:"F",d:"Hard",t:"MCQ",q:"Knowledge distillation in the LRM training pipeline serves what purpose?",o:["A) It increases the number of parameters in the model","B) It compresses the full model's capability into a smaller, deployable model","C) It retrieves knowledge from external databases during inference","D) It is the same as supervised fine-tuning"],a:"B",e:"Knowledge distillation compresses the large trained model's capability into a smaller, economically viable deployment model."},
+  {s:"F",d:"Medium",t:"MULTI",q:"Which are among the reasoning types used by LRMs? (Select ALL that apply)",o:["A) Deductive reasoning","B) Inductive reasoning","C) Reductive reasoning","D) Abductive reasoning","E) Productive reasoning"],a:"A, B, D",e:"LRMs use Deductive (rules to conclusions), Inductive (examples to rules), and Abductive (best explanation). 'Reductive' and 'Productive' are not course-defined types."},
+  {s:"F",d:"Hard",t:"MULTI",q:"Which are TRUE about the LRM 4-stage training pipeline? (Select ALL that apply)",o:["A) Pre-training builds general world knowledge","B) RL teaches the model to reason coherently, not just pattern-match","C) Knowledge distillation increases model size for deployment","D) Supervised fine-tuning adapts the model to a specific domain","E) The pipeline stages can be run in any order"],a:"A, B, D",e:"A, B, D are correct. C is false — distillation compresses (shrinks) the model. E is false — the stages are sequential."},
+  {s:"G",d:"Easy",t:"TF",q:"An AI Assistant executes process steps autonomously, while an AI Agent only responds to queries.",a:"FALSE",e:"Reversed. An AI Agent executes process steps; an AI Assistant surfaces information but the human remains the actor."},
+  {s:"G",d:"Easy",t:"TF",q:"Source-to-Pay begins with a purchase requisition and ends with supplier performance review.",a:"TRUE",e:"Full S2P: Requisition → Sourcing → Supplier selection → PO → Goods receipt → 3-way match → Payment → Supplier performance review."},
+  {s:"G",d:"Medium",t:"TF",q:"The 3-way match in S2P compares the Purchase Order, Goods Receipt, and Invoice.",a:"TRUE",e:"The 3-way match automates comparison of PO, GRN, and invoice — flagging discrepancies and routing exceptions to humans."},
+  {s:"G",d:"Medium",t:"TF",q:"AGI has been achieved by several leading AI laboratories as of mid-2026.",a:"FALSE",e:"Every deployed AI system in 2026 remains ANI. AGI — human-level continuous learning and cross-domain transfer — has not been achieved."},
+  {s:"G",d:"Hard",t:"TF",q:"The Millennium Project focuses on neuroscience-based computational architectures to inspire AGI.",a:"FALSE",e:"The Millennium Project is a governance initiative. National Brain Projects (EU, US, China) are the ones mapping the brain for computational inspiration."},
+  {s:"G",d:"Hard",t:"TF",q:"Measuring AI impact using F1 scores and accuracy metrics is the correct way to communicate business value.",a:"FALSE",e:"Business metrics (cycle time, error rate, cost per transaction) should be primary. F1 and accuracy are internal technical proxies."},
+  {s:"G",d:"Easy",t:"MCQ",q:"Why is Source-to-Pay chosen as the capstone end-to-end AI example?",o:["A) It is the simplest process with fewest documents","B) It has cross-module complexity, diverse documents, high automation potential, and clear compliance requirements","C) It only involves the Finance module","D) It is the process where AI performs worst"],a:"B",e:"S2P scores on all five selection criteria: high volume, rule-bounded decisions, cross-module complexity, diverse documents, and clear compliance needs."},
+  {s:"G",d:"Medium",t:"MCQ",q:"What cycle time reduction is cited as typical for AI-assisted 3-way match automation?",o:["A) 10–20%","B) 30–40%","C) 60–80%","D) Over 95%"],a:"C",e:"The course cites 60–80% cycle time reduction as a typical benchmark for AI automating the 3-way match."},
+  {s:"G",d:"Medium",t:"MCQ",q:"What is the relationship between AGI and ASI?",o:["A) ASI is a prerequisite for AGI","B) AGI and ASI are the same thing","C) AGI is a prerequisite for ASI","D) They are unrelated concepts"],a:"C",e:"AGI (human-level intelligence) must be achieved before ASI (superhuman intelligence across all domains) is possible."},
+  {s:"G",d:"Hard",t:"MCQ",q:"Which best captures the course's argument about MCP and A2A in the long-term AI trajectory?",o:["A) They are dead-end technologies that will be replaced by AGI","B) They are waypoints on the AGI trajectory — the difference from AGI is scope and generality, not kind","C) They are only relevant for small businesses","D) They are sufficient to achieve AGI without further research"],a:"B",e:"Chapter 14 frames MCP, A2A, and agentic architectures as waypoints — the same patterns being scaled in the pursuit of AGI."},
+  {s:"G",d:"Hard",t:"MCQ",q:"What does the course mean by 'cognitive work as a commodity input'?",o:["A) Knowledge workers will be paid less in the future","B) If AI makes intelligence abundant and cheap, the economic model of knowledge industries fundamentally changes","C) Only physical labour retains economic value","D) Companies should outsource all cognitive tasks to AI immediately"],a:"B",e:"If intelligence becomes as commoditised as compute or bandwidth, pricing, hiring, and org design in knowledge industries all shift."},
+  {s:"G",d:"Medium",t:"MULTI",q:"Which are among the five process selection criteria for AI automation? (Select ALL that apply)",o:["A) High transaction volume","B) Rule-bounded decisions","C) Low data availability","D) Clear success metrics","E) Reversible or low-risk actions"],a:"A, B, D, E",e:"The five: High volume, Rule-bounded decisions, Structured data availability (not low!), Clear success metrics, Reversible/low-risk actions. C is the opposite of a criterion."},
+  {s:"G",d:"Hard",t:"MULTI",q:"Which are TRUE about governance and AI capability? (Select ALL that apply)",o:["A) Technical capability and governance must develop at the same pace","B) Governance is only relevant once AGI is achieved","C) The Millennium Project treats AGI as primarily a governance challenge requiring international coordination","D) Capability without governance creates risk; governance without capability creates irrelevance","E) National Brain Projects map the brain to inspire new computational architectures"],a:"A, C, D, E",e:"A, C, D, E are correct. B is false — the course argues governance is already urgent before AGI."},
+  {s:"H",d:"Hard",t:"MCQ",q:"A company wants specialised Finance, HR, and Supply Chain agents to automatically delegate sub-tasks to each other. Which protocol is most relevant?",o:["A) RAG","B) LoRA","C) A2A","D) MCP"],a:"C",e:"A2A governs how specialised agents discover and delegate to each other. MCP handles model-to-tool connections."},
+  {s:"H",d:"Hard",t:"MCQ",q:"An AI system retrieves supplier contracts, reasons across documents to identify clause conflicts, and drafts a risk report. Which architecture best describes this?",o:["A) Naive RAG + LLM","B) Multi-Hop RAG + LRM with CoT + Agentic loop","C) LoRA fine-tuning only","D) A2A + MCP without RAG"],a:"B",e:"This requires: Multi-Hop RAG (chaining retrieval) + LRM with Chain-of-Thought (reasoning across clauses) + Agentic loop (orchestrating and drafting)."},
+  {s:"H",d:"Hard",t:"MCQ",q:"A procurement agent runs the 3-way match autonomously but escalates discrepancies to a human approver. What governance model is this?",o:["A) Fully autonomous AI with no human involvement","B) AI-in-the-loop — AI executes, human reviews exceptions","C) Human-in-the-loop — human approves every action","D) Rule-based automation with no AI"],a:"B",e:"The agent executes autonomously and only escalates exceptions — this is AITL, not HITL (where humans approve every step)."},
+  {s:"H",d:"Hard",t:"MCQ",q:"Which sequence correctly represents the LRM 4-stage training pipeline?",o:["A) RL → Pre-training → SFT → Distillation","B) Pre-training → SFT → RL → Distillation","C) SFT → Pre-training → Distillation → RL","D) Distillation → Pre-training → RL → SFT"],a:"B",e:"Correct order: Pre-training → SFT (domain) → RL (reasoning quality) → Knowledge Distillation (compress for deployment)."},
+  {s:"H",d:"Hard",t:"TF",q:"A system using BM25 + dense vector retrieval, then a cross-encoder re-ranker, exemplifies Hybrid Retrieval RAG with Re-ranking.",a:"TRUE",e:"Hybrid Retrieval (BM25 + dense) addresses keyword and semantic matching; adding a cross-encoder re-ranker is the Re-ranking step."},
+  {s:"H",d:"Hard",t:"TF",q:"The course argues that investing in MCP, A2A, and agentic pipelines is purely a tactical IT decision with no strategic significance.",a:"FALSE",e:"Chapter 14 frames these investments as strategic positioning for competing in a post-AGI economy where intelligence is a commodity input."},
+  {s:"H",d:"Hard",t:"MULTI",q:"Which characteristics support selecting a process for AI agent automation? (Select ALL that apply)",o:["A) The process handles 10,000+ transactions per month","B) Decisions are highly rule-bounded and well-defined","C) The process requires creative judgment on every case","D) Structured data (invoices, POs, forms) is readily available","E) Errors are catastrophic and irreversible"],a:"A, B, D",e:"High volume (A), rule-bounded decisions (B), and structured data (D) favour automation. Creative judgment (C) and irreversible errors (E) argue against it."},
+  {s:"H",d:"Hard",t:"MULTI",q:"Which correctly distinguish the three AI maturity stages? (Select ALL that apply)",o:["A) Every AI system in commercial products in 2026 is ANI","B) AGI requires the ability to transfer knowledge across domains","C) ASI has been demonstrated in controlled lab environments as of 2026","D) ANI systems like ChatGPT are task-specific intelligence","E) AGI is a prerequisite for ASI"],a:"A, B, D, E",e:"A, B, D, E are correct. C is false — ASI has not been demonstrated anywhere."},
+  {s:"H",d:"Hard",t:"MULTI",q:"Which correctly describe the Source-to-Pay process flow? (Select ALL that apply)",o:["A) It begins with a purchase requisition","B) It involves a 3-way match between PO, goods receipt, and invoice","C) It ends with customer payment collection","D) Supplier performance review is the final stage","E) It spans Finance, Supply Chain, and Procurement modules"],a:"A, B, D, E",e:"A, B, D, E are correct. C is wrong — customer payment collection is Lead-to-Cash (AR), not S2P (AP)."},
+  {s:"H",d:"Hard",t:"MULTI",q:"Which are TRUE about the six criteria defining a 'research-grade' AI system? (Select ALL that apply)",o:["A) Multi-step reasoning capability","B) Source attribution with citable evidence","C) The ability to generate images from text","D) Self-evaluation of its own outputs","E) Uncertainty quantification"],a:"A, B, D, E",e:"A, B, D, E are the correct criteria. Image generation (C) is not one of the six."},
+  {s:"G2",d:"Easy",t:"TF",q:"Word2vec embeddings allow vector arithmetic that captures semantic meaning (king − man + woman ≈ queen).",a:"TRUE",e:"Word2vec demonstrated that dense embeddings encode semantic relationships geometrically."},
+  {s:"G2",d:"Easy",t:"TF",q:"In a RAG system, the base LLM must be retrained every time a new document is added to the knowledge base.",a:"FALSE",e:"RAG retrieves knowledge at inference time. New documents are added to the vector index only; the LLM does not change."},
+  {s:"G2",d:"Medium",t:"TF",q:"Contextual Compression RAG trims retrieved chunks to only the relevant portion, reducing token cost.",a:"TRUE",e:"Contextual Compression RAG compresses each chunk to the relevant portion, saving context tokens and reducing noise."},
+  {s:"G2",d:"Hard",t:"TF",q:"FAISS is typically deployed as a standalone managed database service similar to a cloud database.",a:"FALSE",e:"FAISS is a library for approximate nearest-neighbor search, typically embedded within other services rather than deployed standalone."},
+  {s:"G2",d:"Hard",t:"TF",q:"OpenSearch provides native hybrid search combining BM25 keyword scoring with dense vector search.",a:"TRUE",e:"OpenSearch natively supports hybrid search combining sparse BM25 retrieval with dense vector similarity search."},
+  {s:"G2",d:"Easy",t:"MCQ",q:"BPE in LLM tokenisation stands for:",o:["A) Binary Processing Encoding","B) Byte Pair Encoding","C) Base Parameter Estimation","D) Bidirectional Processing Engine"],a:"B",e:"Byte Pair Encoding (BPE) is one of the primary sub-word tokenisation algorithms used by modern LLMs."},
+  {s:"G2",d:"Easy",t:"MCQ",q:"Which agent memory type stores records of past interaction sessions?",o:["A) Semantic memory","B) Procedural memory","C) Episodic memory","D) In-context memory"],a:"C",e:"Episodic memory stores past interactions — conversations, decisions, outcomes — allowing agents to recall prior experiences."},
+  {s:"G2",d:"Medium",t:"MCQ",q:"MCP server tool manifests primarily enable:",o:["A) Training the LLM on new domain data","B) Models to discover what tools are available and invoke them correctly","C) Encrypting tool outputs before returning them","D) Rate-limiting API calls to external services"],a:"B",e:"MCP manifests describe available tools so models can discover and call them without hardcoded integrations."},
+  {s:"G2",d:"Hard",t:"MCQ",q:"Abductive reasoning in the context of LRM techniques means:",o:["A) Reasoning from examples to general rules","B) Reasoning from rules to conclusions","C) Finding the best explanation for a set of observations","D) Reasoning using probability distributions"],a:"C",e:"Abductive reasoning identifies the most likely explanation given observations — e.g. diagnosing why a process produced an anomalous outcome."},
+  {s:"G2",d:"Hard",t:"MCQ",q:"The primary reason LangChain4j was developed is to:",o:["A) Provide a Python-native alternative to Semantic Kernel","B) Enable JVM-based enterprise backends to integrate AI agent capabilities without Python infrastructure","C) Replace AutoGen in conversation-based scenarios","D) Provide a no-code agent builder"],a:"B",e:"LangChain4j is a Java port allowing JVM enterprise systems to use AI agent capabilities without Python."},
+  {s:"G2",d:"Medium",t:"MULTI",q:"Which vector database solutions are specifically mentioned in the course? (Select ALL that apply)",o:["A) OpenSearch","B) FAISS","C) MongoDB Atlas","D) ChromaDB","E) Elasticsearch"],a:"A, B, E",e:"OpenSearch, FAISS, and Elasticsearch are mentioned. MongoDB Atlas and ChromaDB do not appear in the covered materials."},
+  {s:"G3",d:"Easy",t:"TF",q:"AutoGen is a conversation-based multi-agent framework developed by Microsoft.",a:"TRUE",e:"AutoGen is Microsoft's framework where agents communicate through structured dialogue."},
+  {s:"G3",d:"Easy",t:"TF",q:"Hire-to-Retire is one of the nine cross-functional process flows in enterprise AI architecture.",a:"TRUE",e:"Hire-to-Retire covers the full HR lifecycle from recruitment through to offboarding."},
+  {s:"G3",d:"Medium",t:"TF",q:"In the enterprise cascade pattern, the most capable model should handle all queries for maximum accuracy.",a:"FALSE",e:"The cascade pattern sends simple queries to fast cheap models and only escalates complex queries, balancing cost and quality."},
+  {s:"G3",d:"Medium",t:"TF",q:"Record-to-Report covers financial period-end close activities including consolidation and management reporting.",a:"TRUE",e:"Record-to-Report (R2R) covers financial data collection, consolidation, and statutory/management reporting."},
+  {s:"G3",d:"Hard",t:"TF",q:"In A2A production deployments, mutual authentication between agents is optional for non-critical operations.",a:"FALSE",e:"The course states mutual authentication, scoped permissions, and rate limiting are mandatory in all production A2A deployments."},
+  {s:"G3",d:"Hard",t:"TF",q:"Knowledge distillation produces a model larger than the original trained model.",a:"FALSE",e:"Distillation compresses capability into a smaller deployable model. The distilled model is smaller."},
+  {s:"G3",d:"Easy",t:"MCQ",q:"Which framework uses a Crew → Agents → Tasks hierarchy?",o:["A) AutoGen","B) LangGraph","C) CrewAI","D) Semantic Kernel"],a:"C",e:"CrewAI structures agents in role-based teams with the Crew → Agents → Tasks hierarchy."},
+  {s:"G3",d:"Easy",t:"MCQ",q:"Forecast-to-Fulfill primarily covers:",o:["A) Financial period-end close and statutory reporting","B) Demand forecasting through inventory management to order fulfillment","C) Recruitment through to employee offboarding","D) Customer complaint through to resolution"],a:"B",e:"Forecast-to-Fulfill covers the supply chain cycle from demand sensing through inventory planning to fulfillment."},
+  {s:"G3",d:"Medium",t:"MCQ",q:"The main reason relational databases fall short for agentic memory is:",o:["A) They cannot store text data","B) Relationship traversal queries require expensive JOINs too slow for real-time agentic decisions","C) They have insufficient storage capacity","D) They do not support encryption"],a:"B",e:"Complex relationship queries need multiple JOINs in SQL but are a single graph traversal — too slow for real-time agentic reasoning."},
+  {s:"G3",d:"Medium",t:"MCQ",q:"Which A2A protocol binding is best for real-time streaming agent communication?",o:["A) HTTP/REST","B) gRPC","C) WebSocket","D) SMTP"],a:"C",e:"WebSocket is most suitable for real-time streaming communication between agents."},
+  {s:"G3",d:"Hard",t:"MCQ",q:"PII redaction before embedding is critical because:",o:["A) It prevents any document containing personal data from being retrieved","B) Without it, sensitive personal data becomes permanently encoded in the vector index and retrievable by semantic similarity","C) It prevents the model from generating text about real people","D) It prevents administrators from accessing the database"],a:"B",e:"PII in a vector index without redaction is permanently retrievable by semantic similarity — creating uncontrolled privacy exposure."},
+  {s:"G3",d:"Hard",t:"MCQ",q:"The Apple research finding on LRM limitations states that:",o:["A) LRMs consume too much energy for enterprise use","B) LRM accuracy collapses beyond a certain problem complexity threshold","C) LRMs are inferior to LLMs for all business tasks","D) Apple developed a competing architecture to the transformer"],a:"B",e:"Apple research found accuracy collapse at high complexity — LRM reasoning cannot scale infinitely with compute."},
+  {s:"G3",d:"Hard",t:"MULTI",q:"Which are BUSINESS-level metrics for measuring AI impact? (Select ALL that apply)",o:["A) Invoice processing cycle time reduction from 14 days to 3 days","B) F1 score of the document classification model","C) Cost per transaction processed","D) Model accuracy on a held-out test set","E) Error rate in 3-way match discrepancy detection"],a:"A, C, E",e:"Business metrics: cycle time (A), cost per transaction (C), process error rate (E). F1 (B) and test accuracy (D) are internal technical proxies."},
+  {s:"G3",d:"Hard",t:"MULTI",q:"Which correctly describe relationships between course architectural concepts? (Select ALL that apply)",o:["A) RAG grounds LLMs in knowledge; MCP gives agents ability to act; A2A enables agent coordination","B) LRMs replace the need for RAG entirely in enterprise deployments","C) Agentic frameworks in Ch 10 implement the agent loop concepts from Ch 8","D) A2A Agent Cards enable agent discovery without manual configuration","E) The course arc progresses from LLM foundations through agentic systems to AGI as a coherent trajectory"],a:"A, C, D, E",e:"A, C, D, E are all correct. B is false: LRMs and RAG solve different problems and are often combined."}
+];
+
+let mode = "all", selSections = new Set(Object.keys(SECTIONS));
+let gameQ = [], idx = 0, score = 0, streak = 0, bestStreak = 0, answers = [];
+let multiSel = new Set();
+
+function show(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+function selectMode(el) {
+  document.querySelectorAll('.mode-card').forEach(c => c.classList.remove('sel'));
+  el.classList.add('sel');
+  mode = el.dataset.mode;
+  document.getElementById('section-picker').style.display = mode === 'section' ? 'block' : 'none';
+}
+
+(function buildPills() {
+  const el = document.getElementById('section-pills');
+  Object.entries(SECTIONS).forEach(([k, v]) => {
+    const p = document.createElement('button');
+    p.className = 'pill sel'; p.textContent = v; p.dataset.s = k;
+    p.onclick = () => {
+      p.classList.toggle('sel');
+      if (p.classList.contains('sel')) selSections.add(k); else selSections.delete(k);
+    };
+    el.appendChild(p);
+  });
+})();
+
+function shuffle(a) { return a.slice().sort(() => Math.random() - .5); }
+
+function startGame() {
+  let pool = Q.slice();
+  if (mode === 'quick') pool = shuffle(Q).slice(0, 20);
+  else if (mode === 'hard') pool = Q.filter(q => q.d === 'Hard');
+  else if (mode === 'section') pool = Q.filter(q => selSections.has(q.s));
+  if (!pool.length) { alert('No questions match. Select more sections.'); return; }
+  gameQ = shuffle(pool); idx = 0; score = 0; streak = 0; bestStreak = 0; answers = [];
+  show('quiz');
+  renderQ();
+}
+
+function renderQ() {
+  if (idx >= gameQ.length) { showResults(); return; }
+  const q = gameQ[idx];
+  const pct = Math.round(idx / gameQ.length * 100);
+  document.getElementById('prog').style.width = pct + '%';
+  document.getElementById('q-count').textContent = (idx + 1) + ' / ' + gameQ.length;
+  document.getElementById('hud-score').textContent = score;
+  document.getElementById('hud-streak').textContent = streak;
+  document.getElementById('hud-left').textContent = gameQ.length - idx;
+
+  const diffClass = { Easy: 'chip-easy', Medium: 'chip-medium', Hard: 'chip-hard' }[q.d];
+  const typeLabel = { TF: 'True / False', MCQ: 'Multiple choice', MULTI: 'Multi-select' }[q.t];
+  document.getElementById('q-meta').innerHTML =
+    `<span class="chip ${diffClass}">${q.d}</span><span class="chip chip-type">${typeLabel}</span><span class="chip chip-section">${SECTIONS[q.s] || q.s}</span>`;
+  document.getElementById('q-text').textContent = q.q;
+  document.getElementById('feedback-area').innerHTML = '';
+  document.getElementById('next-area').innerHTML = '';
+  multiSel.clear();
+
+  const area = document.getElementById('answer-area');
+  if (q.t === 'TF') {
+    area.innerHTML = `<div class="tf-row">
+      <button class="tf-btn" onclick="answerTF('TRUE',this)">True</button>
+      <button class="tf-btn" onclick="answerTF('FALSE',this)">False</button>
+    </div>`;
+  } else if (q.t === 'MCQ') {
+    area.innerHTML = '<div class="opts-list">' +
+      q.o.map((opt, i) => `<button class="opt" onclick="answerMCQ('${String.fromCharCode(65+i)}',this)">${opt}</button>`).join('') +
+      '</div>';
+  } else {
+    area.innerHTML = `<div class="multi-hint">Select all correct answers, then tap Submit</div>
+      <div class="opts-list">${q.o.map((opt, i) => `<button class="opt" data-val="${String.fromCharCode(65+i)}" onclick="toggleMulti('${String.fromCharCode(65+i)}',this)">${opt}</button>`).join('')}</div>
+      <button class="btn-primary" id="msub" style="opacity:.4;pointer-events:none" onclick="submitMulti()">Submit answer</button>
+      <div style="height:10px"></div>`;
+  }
+}
+
+function answerTF(val, btn) {
+  const q = gameQ[idx];
+  const ok = val === q.a;
+  document.querySelectorAll('.tf-btn').forEach(b => {
+    b.classList.add('disabled');
+    if (b.textContent.toUpperCase() === q.a) b.classList.add('correct');
+    else if (b === btn && !ok) b.classList.add('wrong');
+  });
+  resolve(ok, q); idx++; renderNext();
+}
+
+function answerMCQ(val, btn) {
+  const q = gameQ[idx];
+  const ok = val === q.a;
+  document.querySelectorAll('.opt').forEach(b => {
+    b.classList.add('disabled');
+    const bv = b.textContent.trim().charAt(0);
+    if (bv === q.a) b.classList.add('correct');
+    else if (b === btn && !ok) b.classList.add('wrong');
+  });
+  resolve(ok, q); idx++; renderNext();
+}
+
+function toggleMulti(val, btn) {
+  if (multiSel.has(val)) { multiSel.delete(val); btn.classList.remove('selected'); }
+  else { multiSel.add(val); btn.classList.add('selected'); }
+  const sub = document.getElementById('msub');
+  if (multiSel.size > 0) { sub.style.opacity = '1'; sub.style.pointerEvents = 'auto'; }
+  else { sub.style.opacity = '.4'; sub.style.pointerEvents = 'none'; }
+}
+
+function submitMulti() {
+  const q = gameQ[idx];
+  const correctSet = new Set(q.a.split(', ').map(s => s.trim()));
+  const userSet = new Set(Array.from(multiSel));
+  const ok = correctSet.size === userSet.size && [...correctSet].every(v => userSet.has(v));
+  document.querySelectorAll('.opt').forEach(b => {
+    b.classList.add('disabled');
+    const bv = b.dataset.val;
+    if (correctSet.has(bv)) b.classList.add('correct');
+    else if (userSet.has(bv) && !correctSet.has(bv)) b.classList.add('wrong');
+  });
+  document.getElementById('msub').style.display = 'none';
+  resolve(ok, q, [...userSet].join(', ')); idx++; renderNext();
+}
+
+function resolve(ok, q, userAns) {
+  score += ok ? 10 : 0;
+  streak = ok ? streak + 1 : 0;
+  bestStreak = Math.max(bestStreak, streak);
+  if (ok && streak > 1) showToast('🔥 ' + streak + ' in a row!');
+  answers.push({ q: q.q, your: userAns || '—', correct: q.a, ok, exp: q.e });
+  const cls = ok ? 'ok' : 'bad';
+  const title = ok ? '✓ Correct' : '✗ Incorrect';
+  document.getElementById('feedback-area').innerHTML =
+    `<div class="feedback ${cls}"><div class="feedback-title">${title}</div><div class="feedback-ans">Answer: ${q.a}</div>${q.e}</div>`;
+  document.getElementById('hud-score').textContent = score;
+  document.getElementById('hud-streak').textContent = streak;
+}
+
+function renderNext() {
+  const last = idx >= gameQ.length;
+  document.getElementById('next-area').innerHTML =
+    `<button class="btn-primary" onclick="renderQ()">${last ? 'See results →' : 'Next question →'}</button>`;
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 1800);
+}
+
+function showResults() {
+  show('results');
+  const total = answers.length, correct = answers.filter(a => a.ok).length;
+  const pct = total ? Math.round(correct / total * 100) : 0;
+  const grade = pct >= 90 ? 'A+' : pct >= 80 ? 'A' : pct >= 70 ? 'B' : pct >= 60 ? 'C' : pct >= 50 ? 'D' : 'F';
+  const msgs = { 'A+': 'Perfect score — exam ready!', A: 'Excellent work!', B: 'Great — almost there!', C: 'Good progress, keep reviewing.', D: 'Keep studying — you can do it.', F: 'More practice needed. Try again!' };
+  document.getElementById('r-grade').textContent = grade;
+  document.getElementById('r-sub').textContent = `${correct} / ${total} correct`;
+  document.getElementById('r-msg').textContent = msgs[grade] || msgs.D;
+  document.getElementById('r-correct').textContent = correct;
+  document.getElementById('r-wrong').textContent = total - correct;
+  document.getElementById('r-streak').textContent = bestStreak;
+  document.getElementById('r-pct').textContent = pct + '%';
+
+  document.getElementById('review-list').innerHTML = answers.map((a, i) => `
+    <div class="review-item">
+      <div class="review-head" onclick="toggleRev(${i})">
+        <div class="r-icon ${a.ok ? 'r-ok' : 'r-bad'}">${a.ok ? '✓' : '✗'}</div>
+        <div class="r-qtext">${a.q}</div>
+      </div>
+      <div class="review-body" id="rv${i}">
+        <div class="review-correct">Correct: ${a.correct}</div>
+        ${!a.ok ? `<div class="review-your">Your answer: ${a.your}</div>` : ''}
+        ${a.exp}
+      </div>
+    </div>`).join('');
+
+  saveScore(pct, grade, correct, total);
+}
+
+function toggleRev(i) { document.getElementById('rv' + i).classList.toggle('open'); }
+
+function saveScore(pct, grade, correct, total) {
+  try {
+    const hs = JSON.parse(localStorage.getItem('baa_hs') || '[]');
+    hs.unshift({ pct, grade, correct, total, date: new Date().toLocaleDateString() });
+    localStorage.setItem('baa_hs', JSON.stringify(hs.slice(0, 5)));
+    renderScores();
+  } catch(e) {}
+}
+
+function renderScores() {
+  try {
+    const hs = JSON.parse(localStorage.getItem('baa_hs') || '[]');
+    const wrap = document.getElementById('scores-wrap');
+    if (!hs.length) { wrap.innerHTML = ''; return; }
+    wrap.innerHTML = `<div style="height:24px"></div><div class="label" style="margin-bottom:10px">Recent scores</div>` +
+      hs.map(s => `<div class="score-row"><span class="muted">${s.date}</span><span>${s.correct}/${s.total} correct</span><span style="font-weight:600;color:var(--accent)">${s.grade} · ${s.pct}%</span></div>`).join('');
+  } catch(e) {}
+}
+renderScores();
+
+function confirmQuit() { document.getElementById('quit-overlay').classList.add('show'); }
+function closeQuit() { document.getElementById('quit-overlay').classList.remove('show'); }
+function doQuit() { closeQuit(); show('home'); }
+</script>
+</body>
+</html>
