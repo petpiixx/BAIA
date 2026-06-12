@@ -9,451 +9,374 @@
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 :root{
-  --bg:#0F0F1A;--surface:#1A1A2E;--surface2:#22223A;--surface3:#2A2A45;
-  --border:rgba(255,255,255,0.09);--border2:rgba(255,255,255,0.16);
+  --bg:#0F0F1A;--surface:#1A1A2E;--s2:#22223A;--s3:#2A2A45;
+  --b:rgba(255,255,255,.09);--b2:rgba(255,255,255,.16);
   --text:#F0F0F8;--muted:#8A8AB0;--muted2:#5A5A80;
-  --accent:#7F77DD;--accent-soft:#2A2845;--accent-dim:#4A4490;
-  --green:#4CAF7D;--green-soft:#0D2B1A;--green-border:rgba(76,175,125,0.3);
-  --red:#E05C6A;--red-soft:#2B0D12;--red-border:rgba(224,92,106,0.3);
-  --amber:#F0A840;--amber-soft:#2B1D00;
+  --accent:#7F77DD;--asoft:#2A2845;--adim:#4A4490;
+  --green:#4CAF7D;--gsoft:#0D2B1A;--gborder:rgba(76,175,125,.3);
+  --red:#E05C6A;--rsoft:#2B0D12;--rborder:rgba(224,92,106,.3);
+  --amber:#F0A840;--amsoft:#2B1D00;--amborder:rgba(240,168,64,.3);
   --r:14px;--rs:8px;--font:'Inter',-apple-system,BlinkMacSystemFont,sans-serif
 }
 html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--font);font-size:16px;line-height:1.5;overflow-x:hidden}
 #app{max-width:480px;margin:0 auto;min-height:100dvh;display:flex;flex-direction:column}
+button{font-family:var(--font);cursor:pointer;border:none;background:none;color:inherit}
+.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)}
 
-/* ── Tab bar ── */
-.tabbar{display:flex;background:var(--surface);border-bottom:1px solid var(--border);flex-shrink:0}
-.tabbar-btn{flex:1;padding:14px 8px;font-size:13px;font-weight:600;color:var(--muted);background:none;border:none;cursor:pointer;border-bottom:2px solid transparent;transition:color .15s,border-color .15s;letter-spacing:.02em}
-.tabbar-btn.active{color:var(--accent);border-bottom-color:var(--accent)}
-.tab-content{display:none;flex:1;flex-direction:column;overflow-y:auto}
-.tab-content.active{display:flex}
+/* ── Global tab bar ── */
+.tabbar{display:flex;background:var(--surface);border-bottom:1px solid var(--b);flex-shrink:0;position:sticky;top:0;z-index:50}
+.tbb{flex:1;padding:13px 4px;font-size:12px;font-weight:600;color:var(--muted);background:none;border:none;cursor:pointer;border-bottom:2px solid transparent;transition:color .15s,border-color .15s;letter-spacing:.02em}
+.tbb.active{color:var(--accent);border-bottom-color:var(--accent)}
+.tab{display:none;flex:1;flex-direction:column;overflow-y:auto;-webkit-overflow-scrolling:touch}
+.tab.active{display:flex}
 
 /* ── Typography ── */
 .label{font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
 .muted{color:var(--muted);font-size:13px}
 
 /* ── Buttons ── */
-button{font-family:var(--font);cursor:pointer;border:none;background:none;color:inherit}
-.btn-primary{width:100%;padding:16px;font-size:16px;font-weight:600;background:var(--accent);color:#fff;border-radius:var(--r);transition:opacity .15s,transform .1s}
-.btn-primary:active{opacity:.85;transform:scale(.98)}
-.btn-ghost{width:100%;padding:14px;font-size:15px;font-weight:500;border:1px solid var(--border2);border-radius:var(--r);color:var(--text);transition:background .15s}
-.btn-ghost:active{background:var(--surface2)}
-.btn-icon{width:40px;height:40px;display:flex;align-items:center;justify-content:center;border-radius:10px;background:var(--surface2);border:1px solid var(--border);flex-shrink:0}
+.btn{width:100%;padding:15px;font-size:15px;font-weight:600;border-radius:var(--r);transition:opacity .15s,transform .1s;text-align:center}
+.btn:active{opacity:.85;transform:scale(.98)}
+.btn-acc{background:var(--accent);color:#fff}
+.btn-ghost{border:1px solid var(--b2);color:var(--text);background:transparent}
+.btn-ghost:active{background:var(--s2)}
+.btn-sm{padding:10px 14px;font-size:13px;font-weight:600;border-radius:var(--rs)}
+.btn-icon{width:40px;height:40px;display:flex;align-items:center;justify-content:center;border-radius:10px;background:var(--s2);border:1px solid var(--b);flex-shrink:0}
 
-/* ── Screens ── */
-.screen{display:none;flex-direction:column;flex:1;padding:20px 16px 32px}
+/* ── Screens within quiz tab ── */
+.screen{display:none;flex-direction:column;flex:1;padding:18px 16px 36px}
 .screen.active{display:flex}
 
-/* ── Home ── */
-.home-badge{display:inline-block;font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);margin-bottom:6px}
-.home-title{font-size:28px;font-weight:800;letter-spacing:-1px;line-height:1.1;margin-bottom:6px}
-.home-sub{color:var(--muted);font-size:14px;margin-bottom:24px}
-.stat-row{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:24px}
-.stat-box{background:var(--surface);border:1px solid var(--border);border-radius:var(--rs);padding:12px 6px;text-align:center}
-.stat-n{font-size:22px;font-weight:700;color:var(--accent)}
-.stat-l{font-size:11px;color:var(--muted);margin-top:2px}
+/* ══════════════ QUESTIONS TAB ══════════════ */
+/* Home */
+.home-badge{font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);margin-bottom:5px}
+.home-title{font-size:26px;font-weight:800;letter-spacing:-.8px;line-height:1.1;margin-bottom:5px}
+.home-sub{color:var(--muted);font-size:13px;margin-bottom:20px}
+.stat-row{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:20px}
+.stat-box{background:var(--surface);border:1px solid var(--b);border-radius:var(--rs);padding:11px 6px;text-align:center}
+.stat-n{font-size:20px;font-weight:700;color:var(--accent)}
+.stat-l{font-size:10px;color:var(--muted);margin-top:2px}
 
-/* ── Mode + Difficulty grid ── */
-.mode-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px}
-.mode-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:14px 12px;cursor:pointer;text-align:left;transition:border-color .15s,background .15s}
-.mode-card:active{background:var(--surface2)}
-.mode-card.sel{border-color:var(--accent);background:var(--accent-soft)}
-.mode-icon{font-size:20px;margin-bottom:6px}
-.mode-name{font-size:14px;font-weight:600;color:var(--text)}
-.mode-desc{font-size:12px;color:var(--muted);margin-top:2px}
+/* Mode selector */
+.mode-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px}
+.mc{background:var(--surface);border:1px solid var(--b);border-radius:var(--r);padding:13px 12px;cursor:pointer;text-align:left;transition:border-color .15s,background .15s}
+.mc:active{background:var(--s2)}.mc.sel{border-color:var(--accent);background:var(--asoft)}
+.mc-icon{font-size:18px;margin-bottom:5px}.mc-name{font-size:13px;font-weight:600;color:var(--text)}
+.mc-desc{font-size:11px;color:var(--muted);margin-top:2px}
 
-.diff-grid{display:flex;gap:8px;margin-bottom:16px}
-.diff-btn{flex:1;padding:10px 6px;font-size:13px;font-weight:600;border:1px solid var(--border2);border-radius:var(--rs);background:var(--surface);color:var(--muted);cursor:pointer;text-align:center;transition:all .15s}
-.diff-btn.sel-easy{border-color:var(--green);background:var(--green-soft);color:var(--green)}
-.diff-btn.sel-medium{border-color:var(--amber);background:var(--amber-soft);color:var(--amber)}
-.diff-btn.sel-hard{border-color:var(--red);background:var(--red-soft);color:var(--red)}
-.diff-btn.sel-all{border-color:var(--accent);background:var(--accent-soft);color:var(--accent)}
+/* Type toggle (learning vs quiz) */
+.type-toggle{display:flex;background:var(--s2);border-radius:var(--rs);padding:3px;margin-bottom:14px;gap:3px}
+.tt-btn{flex:1;padding:9px 6px;font-size:13px;font-weight:600;border-radius:6px;color:var(--muted);transition:all .15s;text-align:center}
+.tt-btn.sel{background:var(--accent);color:#fff}
 
-.section-pills{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px}
-.pill{padding:6px 12px;border-radius:999px;font-size:12px;font-weight:500;border:1px solid var(--border2);color:var(--muted);cursor:pointer;transition:all .15s}
-.pill.sel{background:var(--accent);border-color:var(--accent);color:#fff}
+/* Difficulty pills */
+.diff-row{display:flex;gap:6px;margin-bottom:14px}
+.dp{flex:1;padding:9px 4px;font-size:12px;font-weight:600;border:1px solid var(--b2);border-radius:var(--rs);color:var(--muted);cursor:pointer;text-align:center;transition:all .15s}
+.dp.sel-all{border-color:var(--accent);background:var(--asoft);color:var(--accent)}
+.dp.sel-easy{border-color:var(--green);background:var(--gsoft);color:var(--green)}
+.dp.sel-med{border-color:var(--amber);background:var(--amsoft);color:var(--amber)}
+.dp.sel-hard{border-color:var(--red);background:var(--rsoft);color:var(--red)}
 
-.scores-list{margin-top:20px}
-.score-row{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border);font-size:13px}
-.score-row:last-child{border-bottom:none}
+/* Section pills */
+.spills{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px}
+.spill{padding:5px 11px;border-radius:999px;font-size:12px;font-weight:500;border:1px solid var(--b2);color:var(--muted);cursor:pointer;transition:all .15s}
+.spill.sel{background:var(--accent);border-color:var(--accent);color:#fff}
 
-/* ── Quiz ── */
-.quiz-top{display:flex;align-items:center;gap:10px;margin-bottom:14px}
-.prog-track{flex:1;height:4px;background:var(--surface2);border-radius:2px;overflow:hidden}
-.prog-fill{height:100%;background:var(--accent);border-radius:2px;transition:width .4s cubic-bezier(.4,0,.2,1)}
-.q-count{font-size:13px;color:var(--muted);white-space:nowrap;font-weight:500}
-.hud{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px}
-.hud-box{background:var(--surface);border:1px solid var(--border);border-radius:var(--rs);padding:10px 4px;text-align:center}
-.hud-n{font-size:18px;font-weight:700}
-.hud-l{font-size:10px;color:var(--muted);margin-top:1px;font-weight:600;text-transform:uppercase;letter-spacing:.04em}
-.q-meta{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
-.chip{font-size:11px;font-weight:600;padding:4px 9px;border-radius:999px;letter-spacing:.02em}
-.chip-easy{background:var(--green-soft);color:var(--green)}
-.chip-medium{background:var(--amber-soft);color:var(--amber)}
-.chip-hard{background:var(--red-soft);color:var(--red)}
-.chip-type{background:var(--accent-soft);color:var(--accent)}
-.chip-section{background:var(--surface2);color:var(--muted)}
-.q-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:18px 16px;margin-bottom:14px}
-.q-text{font-size:16px;line-height:1.55;font-weight:500}
-.opts-list{display:flex;flex-direction:column;gap:8px;margin-bottom:14px}
-.opt{width:100%;text-align:left;padding:14px 16px;border:1px solid var(--border2);border-radius:var(--rs);background:var(--surface);font-size:14px;line-height:1.4;color:var(--text);transition:all .12s;font-family:var(--font)}
-.opt:active{background:var(--surface2)}
-.opt.selected{border-color:var(--accent);background:var(--accent-soft)}
-.opt.correct{border-color:var(--green);background:var(--green-soft);color:var(--green)}
-.opt.wrong{border-color:var(--red);background:var(--red-soft);color:var(--red)}
+/* Progress tracker */
+.prog-section{margin-top:20px}
+.ps-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.ps-item{background:var(--surface);border:1px solid var(--b);border-radius:var(--rs);padding:12px 14px;margin-bottom:7px}
+.ps-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+.ps-name{font-size:13px;font-weight:600}
+.ps-pct{font-size:13px;font-weight:700}
+.ps-bar{height:5px;background:var(--s2);border-radius:3px;overflow:hidden}
+.ps-fill{height:100%;border-radius:3px;transition:width .5s}
+.ps-meta{font-size:11px;color:var(--muted);margin-top:4px}
+
+/* Quiz screen */
+.quiz-top{display:flex;align-items:center;gap:10px;margin-bottom:13px}
+.prog-track{flex:1;height:4px;background:var(--s2);border-radius:2px;overflow:hidden}
+.prog-fill{height:100%;background:var(--accent);border-radius:2px;transition:width .4s}
+.qcount{font-size:13px;color:var(--muted);font-weight:500;white-space:nowrap}
+.hud{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-bottom:13px}
+.hbox{background:var(--surface);border:1px solid var(--b);border-radius:var(--rs);padding:9px 4px;text-align:center}
+.hbox-n{font-size:17px;font-weight:700}
+.hbox-l{font-size:9px;color:var(--muted);margin-top:1px;font-weight:600;text-transform:uppercase;letter-spacing:.04em}
+.q-meta{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:10px}
+.chip{font-size:10px;font-weight:600;padding:3px 8px;border-radius:999px}
+.chip-easy{background:var(--gsoft);color:var(--green)}
+.chip-med{background:var(--amsoft);color:var(--amber)}
+.chip-hard{background:var(--rsoft);color:var(--red)}
+.chip-type{background:var(--asoft);color:var(--accent)}
+.chip-sec{background:var(--s2);color:var(--muted)}
+.chip-learn{background:rgba(240,168,64,.15);color:var(--amber)}
+.q-card{background:var(--surface);border:1px solid var(--b);border-radius:var(--r);padding:16px;margin-bottom:13px}
+.q-text{font-size:15px;line-height:1.55;font-weight:500}
+.opts{display:flex;flex-direction:column;gap:7px;margin-bottom:13px}
+.opt{width:100%;text-align:left;padding:13px 15px;border:1px solid var(--b2);border-radius:var(--rs);background:var(--surface);font-size:14px;line-height:1.4;color:var(--text);transition:all .12s;font-family:var(--font)}
+.opt:active{background:var(--s2)}.opt.selected{border-color:var(--accent);background:var(--asoft)}
+.opt.correct{border-color:var(--green);background:var(--gsoft);color:var(--green)}
+.opt.wrong{border-color:var(--red);background:var(--rsoft);color:var(--red)}
 .opt.disabled{pointer-events:none}
-.tf-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
-.tf-btn{padding:20px 10px;font-size:17px;font-weight:700;border:1px solid var(--border2);border-radius:var(--r);background:var(--surface);color:var(--text);transition:all .12s}
-.tf-btn:active{background:var(--surface2)}
-.tf-btn.correct{border-color:var(--green);background:var(--green-soft);color:var(--green)}
-.tf-btn.wrong{border-color:var(--red);background:var(--red-soft);color:var(--red)}
-.tf-btn.disabled{pointer-events:none}
-.multi-hint{font-size:12px;color:var(--muted);padding:8px 12px;background:var(--surface2);border-radius:var(--rs);margin-bottom:8px}
-.feedback{padding:14px 16px;border-radius:var(--rs);margin-bottom:12px;font-size:14px;line-height:1.55}
-.feedback.ok{background:var(--green-soft);border:1px solid var(--green-border);color:#a0e8c0}
-.feedback.bad{background:var(--red-soft);border:1px solid var(--red-border);color:#f0a0a8}
-.feedback-title{font-weight:700;font-size:15px;margin-bottom:6px;color:var(--text)}
-.feedback-ans{font-weight:600;margin-bottom:4px}
+.tf-row{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:13px}
+.tf-btn{padding:18px 8px;font-size:16px;font-weight:700;border:1px solid var(--b2);border-radius:var(--r);background:var(--surface);color:var(--text);transition:all .12s}
+.tf-btn:active{background:var(--s2)}.tf-btn.correct{border-color:var(--green);background:var(--gsoft);color:var(--green)}
+.tf-btn.wrong{border-color:var(--red);background:var(--rsoft);color:var(--red)}.tf-btn.disabled{pointer-events:none}
+.mhint{font-size:12px;color:var(--muted);padding:7px 11px;background:var(--s2);border-radius:var(--rs);margin-bottom:7px}
 
-/* ── Results ── */
-.results-hero{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:24px 18px;text-align:center;margin-bottom:14px}
-.results-grade{font-size:64px;font-weight:800;color:var(--accent);line-height:1;letter-spacing:-2px}
-.results-sub{font-size:14px;color:var(--muted);margin-top:6px}
-.results-msg{font-size:15px;font-weight:600;color:var(--text);margin-top:8px}
-.results-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px}
-.r-box{background:var(--surface);border:1px solid var(--border);border-radius:var(--rs);padding:14px 8px;text-align:center}
-.r-n{font-size:22px;font-weight:700}
-.r-l{font-size:11px;color:var(--muted);margin-top:2px;text-transform:uppercase;letter-spacing:.05em;font-weight:600}
+/* Explanation box - new rich format */
+.exp-box{border-radius:var(--rs);margin-bottom:12px;overflow:hidden;border:1px solid var(--b)}
+.exp-verdict{padding:12px 14px;font-size:14px;font-weight:700}
+.exp-verdict.ok{background:var(--gsoft);color:var(--green)}
+.exp-verdict.bad{background:var(--rsoft);color:var(--red)}
+.exp-concept{padding:12px 14px;background:var(--s2);border-top:1px solid var(--b)}
+.exp-concept-label{font-size:10px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);margin-bottom:4px}
+.exp-concept-text{font-size:13px;color:var(--text);line-height:1.55}
+.exp-answer{padding:12px 14px;background:var(--surface);border-top:1px solid var(--b)}
+.exp-answer-label{font-size:10px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--green);margin-bottom:4px}
+.exp-answer-text{font-size:13px;color:#a0e8c0;line-height:1.55}
+.exp-options{padding:12px 14px;background:var(--s3);border-top:1px solid var(--b)}
+.exp-options-label{font-size:10px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
+.exp-opt-row{display:flex;gap:8px;margin-bottom:6px;font-size:12px;line-height:1.5}
+.exp-opt-row:last-child{margin-bottom:0}
+.exp-opt-badge{font-size:11px;font-weight:700;min-width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+.exp-ok-badge{background:var(--gsoft);color:var(--green)}
+.exp-bad-badge{background:var(--rsoft);color:var(--red)}
+.exp-neu-badge{background:var(--s2);color:var(--muted)}
+.exp-opt-text{color:var(--muted);line-height:1.5}
 
-/* ── Chapter report ── */
-.chapter-report{margin-bottom:16px}
-.cr-title{font-size:14px;font-weight:700;color:var(--text);margin-bottom:2px}
-.cr-meta{font-size:12px;color:var(--muted);margin-bottom:6px}
-.cr-bar-wrap{height:8px;background:var(--surface2);border-radius:4px;overflow:hidden;margin-bottom:4px}
-.cr-bar{height:100%;border-radius:4px;transition:width .6s cubic-bezier(.4,0,.2,1)}
-.cr-pct{font-size:12px;font-weight:600}
-.cr-item{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:14px;margin-bottom:8px}
+/* Results */
+.results-hero{background:var(--surface);border:1px solid var(--b);border-radius:var(--r);padding:22px 16px;text-align:center;margin-bottom:13px}
+.r-grade{font-size:60px;font-weight:800;color:var(--accent);line-height:1;letter-spacing:-2px}
+.r-sub{font-size:13px;color:var(--muted);margin-top:6px}
+.r-msg{font-size:14px;font-weight:600;color:var(--text);margin-top:8px}
+.r-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:14px}
+.r-box{background:var(--surface);border:1px solid var(--b);border-radius:var(--rs);padding:13px 7px;text-align:center}
+.r-n{font-size:20px;font-weight:700}.r-l{font-size:10px;color:var(--muted);margin-top:2px;text-transform:uppercase;letter-spacing:.05em;font-weight:600}
+
+/* Chapter report */
+.cr-item{background:var(--surface);border:1px solid var(--b);border-radius:var(--r);padding:13px;margin-bottom:7px}
 .cr-need{border-color:var(--red);border-left:3px solid var(--red)}
-.cr-ok{border-color:var(--green-border)}
-.study-badge{display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:999px;font-size:11px;font-weight:600}
-.badge-study{background:var(--red-soft);color:var(--red)}
-.badge-good{background:var(--green-soft);color:var(--green)}
-.badge-none{background:var(--surface2);color:var(--muted)}
+.cr-ok{border-color:var(--gborder)}
+.cr-title{font-size:13px;font-weight:700}
+.cr-meta{font-size:11px;color:var(--muted);margin-bottom:5px}
+.cr-bar-wrap{height:5px;background:var(--s2);border-radius:3px;overflow:hidden;margin-bottom:3px}
+.cr-bar{height:100%;border-radius:3px;transition:width .6s}
+.study-btn{margin-top:10px;width:100%;padding:10px;font-size:13px;font-weight:600;background:var(--accent);color:#fff;border-radius:var(--rs);border:none;cursor:pointer}
 
-/* ── Review list ── */
-.review-item{border:1px solid var(--border);border-radius:var(--rs);margin-bottom:7px;overflow:hidden}
-.review-head{padding:12px 14px;cursor:pointer;display:flex;align-items:flex-start;gap:10px;background:var(--surface)}
-.r-icon{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0;margin-top:1px}
-.r-ok2{background:var(--green-soft);color:var(--green)}
-.r-bad{background:var(--red-soft);color:var(--red)}
-.r-qtext{font-size:13px;line-height:1.4;flex:1}
-.review-body{display:none;padding:12px 14px;background:var(--surface2);border-top:1px solid var(--border);font-size:12px;color:var(--muted);line-height:1.6}
-.review-body.open{display:block}
-.rev-correct{font-weight:600;color:var(--green);margin-bottom:4px}
-.rev-your{color:var(--red);margin-bottom:4px}
+/* Review list */
+.rev-item{border:1px solid var(--b);border-radius:var(--rs);margin-bottom:6px;overflow:hidden}
+.rev-head{padding:11px 13px;cursor:pointer;display:flex;align-items:flex-start;gap:9px;background:var(--surface)}
+.r-icon{width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;margin-top:1px}
+.ri-ok{background:var(--gsoft);color:var(--green)}.ri-bad{background:var(--rsoft);color:var(--red)}
+.r-qtext{font-size:12px;line-height:1.4;flex:1}
+.rev-body{display:none;padding:11px 13px;background:var(--s2);border-top:1px solid var(--b);font-size:12px;color:var(--muted);line-height:1.6}
+.rev-body.open{display:block}
+.rev-correct{font-weight:600;color:var(--green);margin-bottom:3px}
+.rev-yours{color:var(--red);margin-bottom:3px}
 
-/* ── Action row ── */
-.action-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
+.action-row{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:13px}
+.gap{height:10px}.gapl{height:18px}
 
-/* ── Summary tab ── */
-.summary-wrap{padding:20px 16px 40px}
-.s-header{margin-bottom:20px}
-.s-title{font-size:22px;font-weight:800;letter-spacing:-.5px;margin-bottom:4px}
-.s-sub{font-size:13px;color:var(--muted)}
-.s-section{margin-bottom:24px}
-.s-section-title{font-size:16px;font-weight:700;color:var(--accent);margin-bottom:2px;display:flex;align-items:center;gap:8px}
-.s-section-sub{font-size:12px;color:var(--muted);margin-bottom:10px}
-.s-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:14px;margin-bottom:8px}
-.s-card-title{font-size:14px;font-weight:600;margin-bottom:6px;color:var(--text)}
-.s-card-body{font-size:13px;color:var(--muted);line-height:1.65}
-.s-card-body strong{color:var(--text);font-weight:600}
-.acronym-grid{display:grid;grid-template-columns:1fr;gap:8px}
-.acro-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--rs);padding:12px 14px;display:flex;gap:12px;align-items:flex-start}
-.acro-abbr{font-size:15px;font-weight:800;color:var(--accent);min-width:52px;flex-shrink:0;letter-spacing:-.5px}
-.acro-body{}
-.acro-full{font-size:13px;font-weight:600;color:var(--text);margin-bottom:2px}
-.acro-def{font-size:12px;color:var(--muted);line-height:1.55}
-.divider{height:1px;background:var(--border);margin:20px 0}
+/* ══════════════ CHEAT SHEET TAB ══════════════ */
+.cs-wrap{padding:16px 16px 40px}
 
-/* ── Overlay ── */
-.overlay-wrap{position:fixed;inset:0;background:rgba(0,0,0,.72);display:none;align-items:center;justify-content:center;z-index:100;padding:20px}
-.overlay-wrap.show{display:flex}
-.overlay-box{background:var(--surface);border:1px solid var(--border2);border-radius:var(--r);padding:24px 20px;width:100%;max-width:320px;text-align:center}
-.overlay-box h3{margin-bottom:8px}
-.overlay-box p{color:var(--muted);font-size:14px;margin-bottom:20px}
-.overlay-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.toast{position:fixed;top:24px;left:50%;transform:translateX(-50%);background:var(--accent);color:#fff;font-size:14px;font-weight:600;padding:10px 20px;border-radius:999px;opacity:0;pointer-events:none;transition:opacity .3s;z-index:200;white-space:nowrap}
+/* Chapter switcher */
+.ch-switcher{display:flex;overflow-x:auto;gap:6px;padding-bottom:2px;margin-bottom:16px;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+.ch-switcher::-webkit-scrollbar{display:none}
+.ch-btn{padding:7px 14px;border-radius:999px;font-size:12px;font-weight:600;border:1px solid var(--b2);color:var(--muted);white-space:nowrap;cursor:pointer;flex-shrink:0;transition:all .15s;background:var(--surface)}
+.ch-btn.sel{background:var(--accent);border-color:var(--accent);color:#fff}
+
+/* Cheat sheet cards */
+.cs-section{margin-bottom:20px}
+.cs-sec-label{font-size:11px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--accent);margin-bottom:8px}
+.cs-card{background:var(--surface);border:1px solid var(--b);border-radius:var(--r);padding:13px;margin-bottom:7px}
+.cs-card-title{font-size:13px;font-weight:700;color:var(--text);margin-bottom:5px}
+.cs-bullets{list-style:none}
+.cs-bullets li{font-size:12px;color:var(--muted);line-height:1.6;padding:3px 0;padding-left:14px;position:relative;border-bottom:1px solid var(--b)}
+.cs-bullets li:last-child{border-bottom:none}
+.cs-bullets li::before{content:"·";position:absolute;left:0;color:var(--accent);font-weight:700}
+.cs-bullets li strong{color:var(--text);font-weight:600}
+
+/* Acronym cards */
+.acro-card{background:var(--surface);border:1px solid var(--b);border-radius:var(--rs);padding:11px 13px;margin-bottom:7px;display:flex;gap:11px}
+.acro-abbr{font-size:14px;font-weight:800;color:var(--accent);min-width:50px;flex-shrink:0;letter-spacing:-.3px}
+.acro-full{font-size:12px;font-weight:600;color:var(--text);margin-bottom:2px}
+.acro-def{font-size:11px;color:var(--muted);line-height:1.5}
+
+/* ══════════════ SUMMARY TAB ══════════════ */
+.sum-wrap{padding:16px 16px 40px}
+.sum-card{background:var(--surface);border:1px solid var(--b);border-radius:var(--r);padding:14px;margin-bottom:10px}
+.sum-session{font-size:10px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--accent);margin-bottom:2px}
+.sum-title{font-size:15px;font-weight:700;margin-bottom:10px}
+.sum-point{margin-bottom:9px;padding-bottom:9px;border-bottom:1px solid var(--b)}
+.sum-point:last-child{border-bottom:none;margin-bottom:0;padding-bottom:0}
+.sum-pt{font-size:13px;font-weight:600;color:var(--text);margin-bottom:2px}
+.sum-pb{font-size:12px;color:var(--muted);line-height:1.55}
+
+/* ══════════════ OVERLAY ══════════════ */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.72);display:none;align-items:center;justify-content:center;z-index:100;padding:20px}
+.overlay.show{display:flex}
+.overlay-box{background:var(--surface);border:1px solid var(--b2);border-radius:var(--r);padding:22px 18px;width:100%;max-width:320px;text-align:center}
+.overlay-box h3{margin-bottom:7px}.overlay-box p{color:var(--muted);font-size:13px;margin-bottom:18px}
+.ov-row{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.toast{position:fixed;top:22px;left:50%;transform:translateX(-50%);background:var(--accent);color:#fff;font-size:13px;font-weight:600;padding:9px 18px;border-radius:999px;opacity:0;pointer-events:none;transition:opacity .3s;z-index:200;white-space:nowrap}
 .toast.show{opacity:1}
-
-.gap{height:12px}.gap-lg{height:20px}
-.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)}
 </style>
 </head>
 <body>
 <div id="app">
-  <h1 class="sr-only">Business AI Architectures — Interactive Exam Quiz for NOVA IMS</h1>
+<h1 class="sr-only">Business AI Architectures Interactive Exam Quiz — NOVA IMS</h1>
 
-  <!-- ── Tab bar ── -->
-  <div class="tabbar">
-    <button class="tabbar-btn active" onclick="switchTab('quiz-tab',this)">Questions</button>
-    <button class="tabbar-btn" onclick="switchTab('summary-tab',this)">Study Guide</button>
-  </div>
+<!-- ── Global tab bar ── -->
+<div class="tabbar">
+  <button class="tbb active" onclick="switchTab('tab-q',this)">Questions</button>
+  <button class="tbb" onclick="switchTab('tab-cs',this)">Cheat Sheet</button>
+  <button class="tbb" onclick="switchTab('tab-sum',this)">Summary</button>
+</div>
 
-  <!-- ══════════════ QUIZ TAB ══════════════ -->
-  <div class="tab-content active" id="quiz-tab">
+<!-- ══════════════ QUESTIONS TAB ══════════════ -->
+<div class="tab active" id="tab-q">
 
-    <!-- HOME screen -->
-    <div class="screen active" id="home">
-      <div style="padding-top:4px">
-        <div class="home-badge">NOVA IMS · Pedro Ferreira</div>
-        <div class="home-title">Business AI Architectures</div>
-        <div class="home-sub">131 questions · 5 sessions · all chapters</div>
-        <div class="stat-row">
-          <div class="stat-box"><div class="stat-n">131</div><div class="stat-l">Questions</div></div>
-          <div class="stat-box"><div class="stat-n">10</div><div class="stat-l">Sections</div></div>
-          <div class="stat-box"><div class="stat-n">3</div><div class="stat-l">Types</div></div>
-        </div>
+  <!-- HOME screen -->
+  <div class="screen active" id="home">
+    <div class="home-badge">NOVA IMS · Pedro Ferreira</div>
+    <div class="home-title">Business AI Architectures</div>
+    <div class="home-sub">189 questions · 126 exam · 63 learning</div>
+    <div class="stat-row">
+      <div class="stat-box"><div class="stat-n">189</div><div class="stat-l">Questions</div></div>
+      <div class="stat-box"><div class="stat-n">9</div><div class="stat-l">Sections</div></div>
+      <div class="stat-box"><div class="stat-n" id="home-done">0</div><div class="stat-l">Answered</div></div>
+    </div>
 
-        <div class="label" style="margin-bottom:10px">Mode</div>
-        <div class="mode-grid" id="mode-grid">
-          <div class="mode-card sel" data-mode="all" onclick="selMode(this)">
-            <div class="mode-icon">📚</div>
-            <div class="mode-name">Full exam</div>
-            <div class="mode-desc">All 131 questions</div>
-          </div>
-          <div class="mode-card" data-mode="quick" onclick="selMode(this)">
-            <div class="mode-icon">⚡</div>
-            <div class="mode-name">Quick drill</div>
-            <div class="mode-desc">20 random questions</div>
-          </div>
-          <div class="mode-card" data-mode="hard" onclick="selMode(this)">
-            <div class="mode-icon">🔥</div>
-            <div class="mode-name">Hard only</div>
-            <div class="mode-desc">Challenge mode</div>
-          </div>
-          <div class="mode-card" data-mode="section" onclick="selMode(this)">
-            <div class="mode-icon">🎯</div>
-            <div class="mode-name">By chapter</div>
-            <div class="mode-desc">Pick your sections</div>
-          </div>
-        </div>
-
-        <div class="label" style="margin-bottom:10px">Difficulty</div>
-        <div class="diff-grid" id="diff-grid">
-          <button class="diff-btn sel-all" data-diff="All" onclick="selDiff(this)">All</button>
-          <button class="diff-btn" data-diff="Easy" onclick="selDiff(this)">Easy</button>
-          <button class="diff-btn" data-diff="Medium" onclick="selDiff(this)">Medium</button>
-          <button class="diff-btn" data-diff="Hard" onclick="selDiff(this)">Hard</button>
-        </div>
-
-        <div id="section-picker" style="display:none">
-          <div class="label" style="margin-bottom:10px">Chapters</div>
-          <div class="section-pills" id="section-pills"></div>
-        </div>
-
-        <button class="btn-primary" onclick="startGame()">▶  Start quiz</button>
-        <div id="scores-wrap" class="scores-list"></div>
+    <div class="label" style="margin-bottom:8px">Mode</div>
+    <div class="mode-grid" id="mode-grid">
+      <div class="mc sel" data-mode="ten" onclick="selMode(this)">
+        <div class="mc-icon">🌊</div><div class="mc-name">10 questions</div><div class="mc-desc">Get your toes wet</div>
+      </div>
+      <div class="mc" data-mode="quick" onclick="selMode(this)">
+        <div class="mc-icon">⚡</div><div class="mc-name">Quick drill</div><div class="mc-desc">20 random questions</div>
+      </div>
+      <div class="mc" data-mode="section" onclick="selMode(this)">
+        <div class="mc-icon">🎯</div><div class="mc-name">By chapter</div><div class="mc-desc">Pick your sections</div>
+      </div>
+      <div class="mc" data-mode="full" onclick="selMode(this)">
+        <div class="mc-icon">📚</div><div class="mc-name">Full exam</div><div class="mc-desc">All 126 questions</div>
       </div>
     </div>
 
-    <!-- QUIZ screen -->
-    <div class="screen" id="quiz">
-      <div class="quiz-top">
-        <button class="btn-icon" onclick="confirmQuit()" aria-label="Quit">✕</button>
-        <div class="prog-track"><div class="prog-fill" id="prog" style="width:0%"></div></div>
-        <div class="q-count" id="q-count">0 / 0</div>
-      </div>
-      <div class="hud">
-        <div class="hud-box"><div class="hud-n" id="hud-score">0</div><div class="hud-l">Score</div></div>
-        <div class="hud-box"><div class="hud-n" id="hud-streak">0</div><div class="hud-l">Streak</div></div>
-        <div class="hud-box"><div class="hud-n" id="hud-left">0</div><div class="hud-l">Left</div></div>
-      </div>
-      <div class="q-meta" id="q-meta"></div>
-      <div class="q-card"><div class="q-text" id="q-text"></div></div>
-      <div id="answer-area"></div>
-      <div id="feedback-area"></div>
-      <div id="next-area"></div>
+    <div id="section-picker" style="display:none">
+      <div class="label" style="margin-bottom:8px">Chapters</div>
+      <div class="spills" id="section-pills"></div>
     </div>
 
-    <!-- RESULTS screen -->
-    <div class="screen" id="results">
-      <div class="results-hero">
-        <div class="results-grade" id="r-grade">A</div>
-        <div class="results-sub" id="r-sub">0 / 0 correct</div>
-        <div class="results-msg" id="r-msg"></div>
-      </div>
-      <div class="results-grid">
-        <div class="r-box"><div class="r-n" id="r-correct">0</div><div class="r-l">Correct</div></div>
-        <div class="r-box"><div class="r-n" id="r-wrong">0</div><div class="r-l">Wrong</div></div>
-        <div class="r-box"><div class="r-n" id="r-streak">0</div><div class="r-l">Best streak</div></div>
-        <div class="r-box"><div class="r-n" id="r-pct">0%</div><div class="r-l">Accuracy</div></div>
-      </div>
+    <div class="label" style="margin-bottom:8px">Type</div>
+    <div class="type-toggle">
+      <div class="tt-btn sel" data-type="exam" onclick="selType(this)">📝 Exam</div>
+      <div class="tt-btn" data-type="learn" onclick="selType(this)">📖 Learning</div>
+      <div class="tt-btn" data-type="both" onclick="selType(this)">🔀 Both</div>
+    </div>
 
-      <!-- Chapter performance report -->
-      <div class="label" style="margin-bottom:10px">Performance by chapter</div>
-      <div id="chapter-report"></div>
+    <div class="label" style="margin-bottom:8px">Difficulty</div>
+    <div class="diff-row">
+      <button class="dp sel-all" data-d="All" onclick="selDiff(this)">All</button>
+      <button class="dp" data-d="Easy" onclick="selDiff(this)">Easy</button>
+      <button class="dp" data-d="Medium" onclick="selDiff(this)">Medium</button>
+      <button class="dp" data-d="Hard" onclick="selDiff(this)">Hard</button>
+    </div>
 
-      <div class="label" style="margin-bottom:10px;margin-top:8px">Answer review</div>
-      <div id="review-list"></div>
+    <button class="btn btn-acc" onclick="startGame()">▶  Start quiz</button>
 
-      <div class="action-row">
-        <button class="btn-ghost" onclick="showScreen('home')">← Menu</button>
-        <button class="btn-primary" onclick="startGame()">Play again</button>
+    <!-- Progress tracker -->
+    <div class="prog-section">
+      <div class="ps-header">
+        <div class="label">Your progress by chapter</div>
+        <button class="muted" style="font-size:12px" onclick="clearProgress()">Reset</button>
       </div>
+      <div id="progress-tracker"></div>
     </div>
   </div>
 
-  <!-- ══════════════ SUMMARY TAB ══════════════ -->
-  <div class="tab-content" id="summary-tab">
-    <div class="summary-wrap">
-      <div class="s-header">
-        <div class="s-title">Study Guide</div>
-        <div class="s-sub">Chapter summaries & key acronyms — all 5 sessions</div>
-      </div>
+  <!-- QUIZ screen -->
+  <div class="screen" id="quiz">
+    <div class="quiz-top">
+      <button class="btn-icon" onclick="confirmQuit()" aria-label="Quit">✕</button>
+      <div class="prog-track"><div class="prog-fill" id="prog" style="width:0%"></div></div>
+      <div class="qcount" id="qcount">0 / 0</div>
+    </div>
+    <div class="hud">
+      <div class="hbox"><div class="hbox-n" id="hud-score">0</div><div class="hbox-l">Score</div></div>
+      <div class="hbox"><div class="hbox-n" id="hud-streak">0</div><div class="hbox-l">Streak</div></div>
+      <div class="hbox"><div class="hbox-n" id="hud-left">0</div><div class="hbox-l">Left</div></div>
+    </div>
+    <div class="q-meta" id="q-meta"></div>
+    <div class="q-card"><div class="q-text" id="q-text"></div></div>
+    <div id="answer-area"></div>
+    <div id="exp-area"></div>
+    <div id="next-area"></div>
+  </div>
 
-      <!-- Acronym glossary -->
-      <div class="s-section">
-        <div class="s-section-title">🔤 Key Acronyms</div>
-        <div class="s-section-sub">Definitions you must know for the exam</div>
-        <div class="acronym-grid" id="acronym-grid"></div>
-      </div>
+  <!-- RESULTS screen -->
+  <div class="screen" id="results">
+    <div class="results-hero">
+      <div class="r-grade" id="r-grade">A</div>
+      <div class="r-sub" id="r-sub">0 / 0 correct</div>
+      <div class="r-msg" id="r-msg"></div>
+    </div>
+    <div class="r-grid">
+      <div class="r-box"><div class="r-n" id="r-correct">0</div><div class="r-l">Correct</div></div>
+      <div class="r-box"><div class="r-n" id="r-wrong">0</div><div class="r-l">Wrong</div></div>
+      <div class="r-box"><div class="r-n" id="r-streak">0</div><div class="r-l">Best streak</div></div>
+      <div class="r-box"><div class="r-n" id="r-pct">0%</div><div class="r-l">Accuracy</div></div>
+    </div>
 
-      <div class="divider"></div>
+    <div class="label" style="margin-bottom:8px">Performance by chapter</div>
+    <div id="chapter-report"></div>
 
-      <!-- Chapter summaries -->
-      <div class="s-section">
-        <div class="s-section-title">📖 Chapter Summaries</div>
-        <div class="s-section-sub">Core concepts from each session</div>
-        <div id="chapter-summaries"></div>
-      </div>
+    <div class="gapl"></div>
+    <div class="label" style="margin-bottom:8px">Answer review</div>
+    <div id="review-list"></div>
+
+    <div class="action-row">
+      <button class="btn btn-ghost" onclick="showScreen('home')">← Menu</button>
+      <button class="btn btn-acc" onclick="startGame()">Play again</button>
     </div>
   </div>
 </div>
 
-<!-- Overlay -->
-<div class="overlay-wrap" id="quit-overlay">
+<!-- ══════════════ CHEAT SHEET TAB ══════════════ -->
+<div class="tab" id="tab-cs">
+  <div class="cs-wrap">
+    <div class="label" style="margin-bottom:10px">Chapter</div>
+    <div class="ch-switcher" id="cs-switcher"></div>
+    <div id="cs-content"></div>
+  </div>
+</div>
+
+<!-- ══════════════ SUMMARY TAB ══════════════ -->
+<div class="tab" id="tab-sum">
+  <div class="sum-wrap">
+    <div class="label" style="margin-bottom:10px">Chapter</div>
+    <div class="ch-switcher" id="sum-switcher"></div>
+    <div id="sum-content"></div>
+  </div>
+</div>
+
+<!-- Quit overlay -->
+<div class="overlay" id="quit-overlay">
   <div class="overlay-box">
     <h3>Quit quiz?</h3>
     <p>Your progress will be lost.</p>
-    <div class="overlay-row">
-      <button class="btn-ghost" onclick="closeQuit()">Keep going</button>
-      <button class="btn-primary" onclick="doQuit()">Quit</button>
+    <div class="ov-row">
+      <button class="btn btn-ghost btn-sm" onclick="closeQuit()">Keep going</button>
+      <button class="btn btn-acc btn-sm" onclick="doQuit()">Quit</button>
     </div>
   </div>
 </div>
 <div class="toast" id="toast"></div>
+</div>
 
 <script>
-// ══════════════════════════════════════════
-// DATA
-// ══════════════════════════════════════════
-
-const SECTIONS = {
-  A:"Foundations & Architecture", B:"Transformers & LLMs", C:"RAG",
-  D:"MCP & AI Agents", E:"A2A & Agentic Frameworks", F:"Research & Reasoning AI",
-  G:"Business AI & AGI", G2:"Extended: Foundations", G3:"Extended: Agents & Business",
-  H:"Cross-chapter Synthesis"
-};
-
-const ACRONYMS = [
-  {a:"AI",f:"Artificial Intelligence",d:"The broad field of building computer systems that perform tasks normally requiring human intelligence — reasoning, learning, problem-solving, and perception."},
-  {a:"ANI",f:"Artificial Narrow Intelligence",d:"AI that performs one specific task well (e.g. ChatGPT, Siri, AlphaFold). Every AI system commercially deployed in 2026 is ANI. Cannot transfer knowledge across domains."},
-  {a:"AGI",f:"Artificial General Intelligence",d:"A hypothetical AI that can learn any intellectual task a human can, transfer knowledge across domains, and improve itself continuously. Not yet achieved as of 2026."},
-  {a:"ASI",f:"Artificial Super Intelligence",d:"A theoretical AI that surpasses human intelligence across ALL domains simultaneously. Requires AGI as a prerequisite. Primarily a safety and governance concern today."},
-  {a:"LLM",f:"Large Language Model",d:"A transformer-based model trained on massive text corpora to predict the next token. Examples: GPT-4, Claude, Gemini. Passive — generates content but cannot act in external systems without an agent layer."},
-  {a:"LRM",f:"Large Reasoning Model",d:"An LLM enhanced with an explicit deliberative 'thinking layer' at inference time. Uses chain-of-thought and RL training to reason step-by-step before answering. Example: OpenAI o3."},
-  {a:"RAG",f:"Retrieval-Augmented Generation",d:"An architecture that retrieves relevant document chunks from a vector index at inference time and includes them in the LLM prompt — grounding generation in verifiable, up-to-date knowledge without retraining the model."},
-  {a:"MCP",f:"Model Context Protocol",d:"A standardised protocol (analogous to USB for hardware) that lets any AI model connect to and invoke any external tool — CRMs, calendars, databases, code execution — without bespoke integrations."},
-  {a:"A2A",f:"Agent-to-Agent Protocol",d:"A protocol enabling specialised AI agents to discover each other (via Agent Cards), delegate sub-tasks, and coordinate complex workflows without human routing. Standardised ~2025. Complementary to MCP."},
-  {a:"LoRA",f:"Low-Rank Adaptation",d:"A fine-tuning technique that injects small trainable matrices (rank r ≪ d) into a frozen model's layers. Reduces trainable parameters by ~10,000× vs full fine-tuning while preserving most capability."},
-  {a:"BPE",f:"Byte Pair Encoding",d:"A sub-word tokenisation algorithm used by most modern LLMs. Merges frequent character pairs iteratively to create a vocabulary of sub-word tokens. The main alternative is SentencePiece."},
-  {a:"CoT",f:"Chain-of-Thought",d:"A prompting technique that instructs the model to produce intermediate reasoning steps before a final answer. Dramatically improves multi-step arithmetic, logic, and planning tasks."},
-  {a:"HITL",f:"Human-in-the-Loop",d:"A governance model where a human must approve EVERY action before the AI agent executes it. Used for high-risk or irreversible operations. Contrast with AITL."},
-  {a:"AITL",f:"AI-in-the-Loop",d:"A governance model where the AI agent executes autonomously and a human reviews a summary or exceptions afterwards. Used for high-volume, lower-risk processes like 3-way match in S2P."},
-  {a:"S2P",f:"Source-to-Pay",d:"End-to-end procurement process: Purchase Requisition → Sourcing (RFQ/RFP) → Supplier Selection → PO Generation → Goods Receipt → 3-Way Match (PO/GR/Invoice) → Payment → Supplier Performance Review."},
-  {a:"ERP",f:"Enterprise Resource Planning",d:"Integrated software systems (e.g. SAP S/4HANA) that manage core business processes — Finance, Supply Chain, Procurement, HR. The 'Digital Core' that agents integrate with via MCP."},
-  {a:"GAN",f:"Generative Adversarial Network",d:"A pre-transformer architecture with two competing networks (generator vs discriminator). A key precursor to generative modelling. Largely superseded by diffusion models and LLMs for most generative tasks."},
-  {a:"BM25",f:"Best Match 25",d:"A classic keyword-based (sparse) retrieval algorithm used in search engines. Scores documents by term frequency and inverse document frequency. Combined with dense vector search in Hybrid Retrieval RAG."},
-  {a:"SFT",f:"Supervised Fine-Tuning",d:"The second stage of LRM training. Adapts the pre-trained model to a specific domain using labelled examples. Precedes Reinforcement Learning in the 4-stage pipeline: Pre-training → SFT → RL → Distillation."},
-  {a:"PII",f:"Personally Identifiable Information",d:"Any data that can identify an individual (names, emails, ID numbers). Must be redacted before embedding documents into a RAG vector index to prevent sensitive data from being permanently retrievable by semantic similarity."},
-  {a:"ROI",f:"Return on Investment",d:"Key AI deployment metric. Course benchmarks: 12–18 month payback period, 250–350% 3-year ROI, 307% for SAP Commerce Cloud B2B. Measured in business terms (cycle time, cost/transaction) not technical metrics (F1, accuracy)."},
-  {a:"RFQ",f:"Request for Quotation",d:"A formal document sent to suppliers asking for pricing on a specific product or service. Part of the Sourcing step in Source-to-Pay. AI agents automate RFQ generation and response analysis."},
-];
-
-const CHAPTER_SUMMARIES = [
-  {
-    id:"A", label:"Session 1 · Intro + Chapter 1", title:"Foundations & Enterprise AI Architecture",
-    keyPoints:[
-      {t:"The enterprise AI stack", b:"Data (passengers) → AI models (aircraft) → tools/protocols (gates/vehicles) → orchestration (air traffic control). Each layer enables the next."},
-      {t:"AI ⊃ ML ⊃ Deep Learning", b:"AI is the broadest field. ML ⊂ AI builds predictive models (Y = f(X)). Deep Learning ⊂ ML uses 3+ layer neural nets for unstructured data."},
-      {t:"ANI → AGI → ASI maturity arc", b:"ANI = task-specific (all 2026 systems). AGI = human-level continuous learning, cross-domain transfer (not yet achieved). ASI = superhuman across all domains (requires AGI first)."},
-      {t:"6 modules + 9 cross-functional flows", b:"Modules: Financial, Supply Chain, Procurement, Customer Relationship, HR, Sustainability. Flows include: Lead-to-Cash, Source-to-Pay, Hire-to-Retire, Record-to-Report, Design-to-Build, Forecast-to-Fulfill, Request-to-Service, Invoice-to-Pay, Issue-to-Resolution."},
-      {t:"SAP Joule as real-world example", b:"An AI co-pilot embedded across SAP's enterprise suite — illustrates how foundation models plug into the Digital Core as ANI, not AGI."},
-    ]
-  },
-  {
-    id:"B", label:"Session 1 · Chapter 3", title:"Transformer Architecture & LLM Foundations",
-    keyPoints:[
-      {t:"Pre-transformer arc: N-grams → Word2vec → Attention", b:"Word2vec proved words could be vectors where king − man + woman ≈ queen. Bahdanau Attention (2014) added selective weighting inside RNNs. GANs introduced generative modelling."},
-      {t:"'Attention Is All You Need' (2017)", b:"Vaswani et al. replaced recurrence with full self-attention, enabling parallelisation. All modern LLMs descend from this architecture."},
-      {t:"Encoder-only vs decoder-only", b:"Encoder-only (BERT) = understanding, classification. Decoder-only (GPT) = auto-regressive text generation. Encoder+Decoder = translation, summarisation."},
-      {t:"Tokenisation & token cost", b:"Sub-word tokenisation (BPE, SentencePiece) — not character-level. Token count = API cost + context window competition. A core enterprise design constraint."},
-      {t:"LoRA fine-tuning", b:"Injects small low-rank matrices (rank r ≪ d) into frozen model layers. Reduces trainable parameters by ~10,000× vs full fine-tuning. Makes domain adaptation economically viable."},
-      {t:"8-component deployment pipeline", b:"Data ingestion → Pre-processing → Embedding → Indexing → Query processing → Retrieval → Re-ranking → Generation. Each stage can fail independently."},
-    ]
-  },
-  {
-    id:"C", label:"Session 2 · Chapter 6", title:"Retrieval-Augmented Generation (RAG)",
-    keyPoints:[
-      {t:"Why RAG exists", b:"LLMs hallucinate facts not in training data. RAG retrieves relevant chunks at inference time — grounding generation in verifiable, citable, current knowledge without retraining."},
-      {t:"Chunking is the most important variable", b:"Chunk size, overlap, and boundary choice determine retrieval quality more than model size. Too large = noise; too small = missing context."},
-      {t:"9 RAG variants (must know all)", b:"Naive · Query Optimisation · Re-Ranking · Contextual Compression · Multi-Hop · Graph RAG · Agentic RAG · Hybrid Retrieval · Memory-Augmented. Each solves a different precision/recall/relational problem."},
-      {t:"Re-ranking adds 10–30% accuracy", b:"Initial vector retrieval returns top-50; a cross-encoder (e.g. Cohere Rerank, NV RerankQA) re-ranks to top-5. Two-stage is significantly more accurate than single-stage."},
-      {t:"4 security mechanisms", b:"Access-controlled retrieval (user permission gates) · Chunk-level audit trails · PII redaction before embedding · Output guardrails."},
-    ]
-  },
-  {
-    id:"D", label:"Session 2 · Chapters 7–8", title:"MCP & AI Agents",
-    keyPoints:[
-      {t:"Foundation model vs AI Agent", b:"FM: passive, single-turn, responds to prompts, no memory, no tool access. Agent: pursues goals, multi-step workflows, memory, tool access via MCP. The difference is between generating content and completing tasks."},
-      {t:"MCP = USB for AI tools", b:"Model Context Protocol provides a standardised discovery + invocation layer. Models find what tools are available (via manifests) and call them with structured inputs. Every call is logged and permission-gated."},
-      {t:"5-phase agent loop", b:"Perceive → Reason → Goal-set → Decide → Execute → repeat. Chapter 10 adds Orchestrate (coordinating sub-agents) as a 6th phase."},
-      {t:"4 memory types", b:"In-context (active window) · Episodic (past interaction logs) · Semantic (facts, knowledge graph) · Procedural (learned action sequences). Graph databases — not relational — support Semantic memory efficiently."},
-      {t:"HITL vs AITL", b:"Human-in-the-loop = human approves every action (high-risk, irreversible). AI-in-the-loop = AI executes, human reviews exceptions (e.g. 3-way match discrepancies in S2P)."},
-    ]
-  },
-  {
-    id:"E", label:"Session 3 · Chapters 9–10", title:"A2A Protocol & Agentic AI Frameworks",
-    keyPoints:[
-      {t:"MCP vs A2A (complementary)", b:"MCP = model-to-tool (one agent using one system). A2A = agent-to-agent (one agent delegating a sub-task to another specialised agent). They work together in enterprise multi-agent deployments."},
-      {t:"Agent Cards = agent discovery", b:"JSON-LD descriptors that advertise an agent's capabilities, input/output schemas, and trust requirements. The machine-readable 'business card' that makes A2A discovery work without manual configuration."},
-      {t:"A2A 3-layer spec + 6 goals", b:"Layers: Data model → Operations (create/update/cancel/status) → Protocol bindings (HTTP/REST, gRPC, WebSocket). Goals: Discoverability · Delegation · Trust · Observability · Interoperability · Fault tolerance."},
-      {t:"7 agentic frameworks", b:"AutoGen (Microsoft, conversation-based) · CrewAI (Crew→Agents→Tasks hierarchy) · LangChain / LangGraph (stateful cycles) · LlamaIndex (data-centric, RAG-heavy) · Semantic Kernel (Microsoft enterprise .NET/Python) · LangChain4j (JVM/Java)."},
-      {t:"A2A risks: emergent behaviour & governance", b:"Multi-agent systems can produce unintended outcomes. Each agent-to-agent call is an attack vector. Mutual authentication + scoped permissions + rate limiting are mandatory in production. Audit trails are critical for attribution."},
-    ]
-  },
-  {
-    id:"F", label:"Session 3–4 · Chapters 11–12", title:"Research AI & Reasoning AI (LRMs)",
-    keyPoints:[
-      {t:"Research-grade AI: 7 building blocks + 6 criteria", b:"Building blocks: Foundation model · Planning · RAG · Tool use · Memory · Multi-agent · Evaluation & verification. Criteria: Multi-step reasoning · Source attribution · Self-evaluation · Dynamic retrieval · Tool orchestration · Uncertainty quantification."},
-      {t:"Two research architecture paradigms", b:"ChatGPT-style (agentic loop): model drives retrieval — flexible but slower. Perplexity-style (retrieval-first): retrieve then generate — faster and more predictable. 2026 trend: hybrid combining both."},
-      {t:"LRM vs LLM", b:"LLM = reflex/pattern-match, single-pass generation. LRM = deliberative thinking layer added at inference time. LRMs spend more compute generating internal reasoning chains (thinking tokens) before answering."},
-      {t:"LRM 4-stage training pipeline", b:"Pre-training (general knowledge) → Supervised Fine-Tuning (domain) → Reinforcement Learning (rewards correct answers AND coherent reasoning chains) → Knowledge Distillation (compress into smaller deployable model)."},
-      {t:"Enterprise cascade pattern", b:"Route by complexity: GPT-4o mini (simple, fast, cheap) → GPT-4o (complex) → o3-mini (edge cases needing deep reasoning). Saves cost while preserving quality. Apple research caveat: LRM accuracy collapses beyond a complexity threshold."},
-    ]
-  },
-  {
-    id:"G", label:"Session 4–5 · Chapters 13–14", title:"End-to-End Business AI & The Road to AGI",
-    keyPoints:[
-      {t:"AI Assistant vs AI Agent", b:"Assistant: responds to queries, surfaces information, drafts content — human remains the actor. Agent: executes process steps autonomously — logs actions, triggers approvals, escalates exceptions. The distinction determines governance model."},
-      {t:"Source-to-Pay as the capstone", b:"S2P = high volume + rule-bounded + cross-module (Finance + Supply + Procurement) + structured documents (PO, GRN, invoice) + clear compliance. 3-way match automation: 60–80% cycle time reduction."},
-      {t:"Process selection criteria (5)", b:"High volume · Rule-bounded decisions · Structured data availability · Clear success metrics · Reversible or low-risk actions. S2P scores on all five."},
-      {t:"Measure business outcomes, not model metrics", b:"Business metrics: cycle time reduction, cost per transaction, error rate. NOT F1 score or test accuracy — those are internal proxies. Communicate in the language of business stakeholders."},
-      {t:"AGI trajectory & governance", b:"MCP, A2A, agentic frameworks are waypoints on the AGI trajectory — not endpoints. 'Cognitive work as commodity': if intelligence is commoditised like compute, the economics of knowledge-intensive industries shift. Governance must develop at the same pace as capability."},
-    ]
-  },
-];
-
 const Q = [
   {s:"A",d:"Easy",t:"TF",q:"At the enterprise level, AI is fundamentally a tool for improving human decision-making at speed and scale.",a:"TRUE",e:"The course defines enterprise AI as a discipline that automates and augments decisions through improving predictions, automation, and resource optimisation."},
   {s:"A",d:"Easy",t:"TF",q:"Deep Learning is a broader field than Machine Learning.",a:"FALSE",e:"Deep Learning is a subset of Machine Learning (DL ⊂ ML ⊂ AI). ML is the subset of AI; DL is a subset of ML."},
@@ -581,80 +504,309 @@ const Q = [
   {s:"G3",d:"Hard",t:"MCQ",q:"The Apple research finding on LRM limitations states that:",o:["A) LRMs consume too much energy for enterprise use","B) LRM accuracy collapses beyond a certain problem complexity threshold","C) LRMs are inferior to LLMs for all business tasks","D) Apple developed a competing architecture to the transformer"],a:"B",e:"Apple research found accuracy collapse at high complexity — LRM reasoning cannot scale infinitely with compute."},
   {s:"G3",d:"Hard",t:"MULTI",q:"Which are BUSINESS-level metrics for measuring AI impact? (Select ALL that apply)",o:["A) Invoice processing cycle time reduction from 14 days to 3 days","B) F1 score of the document classification model","C) Cost per transaction processed","D) Model accuracy on a held-out test set","E) Error rate in 3-way match discrepancy detection"],a:"A, C, E",e:"Business metrics: cycle time (A), cost per transaction (C), process error rate (E). F1 (B) and test accuracy (D) are internal technical proxies."},
   {s:"G3",d:"Hard",t:"MULTI",q:"Which correctly describe relationships between course architectural concepts? (Select ALL that apply)",o:["A) RAG grounds LLMs in knowledge; MCP gives agents ability to act; A2A enables agent coordination","B) LRMs replace the need for RAG entirely in enterprise deployments","C) Agentic frameworks in Ch 10 implement the agent loop concepts from Ch 8","D) A2A Agent Cards enable agent discovery without manual configuration","E) The course arc progresses from LLM foundations through agentic systems to AGI as a coherent trajectory"],a:"A, C, D, E",e:"A, C, D, E are all correct. B is false: LRMs and RAG solve different problems and are often combined."}
+
+  {s:"C",d:"Easy",t:"MCQ",learn:true,q:"What is Naive RAG?",o:["A) A RAG system that uses a knowledge graph for retrieval","B) The simplest RAG approach: retrieve top-k chunks by vector similarity and pass them directly to the LLM","C) A RAG system that rewrites the query before retrieval","D) A RAG system that compresses chunks before generation"],a:"B",e:"Naive RAG is the baseline approach: embed the query, retrieve the most similar document chunks by cosine similarity, concatenate them into the prompt, and generate. Fast but lowest precision — no re-ranking or query optimisation."},
+  {s:"C",d:"Easy",t:"MCQ",learn:true,q:"What is Query Optimisation RAG?",o:["A) RAG that stores past conversations to improve future queries","B) RAG that compresses retrieved chunks to remove irrelevant content","C) RAG that rewrites or expands the query before retrieval to improve recall (e.g. HyDE, step-back prompting, multi-query)","D) RAG that chains multiple retrieval steps where each answer informs the next query"],a:"C",e:"Query Optimisation RAG improves retrieval by transforming the user's query before searching. Techniques include HyDE (generate a hypothetical answer then embed it), step-back prompting (ask a broader question first), and multi-query (generate several phrasings and merge results). Improves recall significantly."},
+  {s:"C",d:"Easy",t:"MCQ",learn:true,q:"What is Re-Ranking RAG and why does it improve accuracy?",o:["A) A two-stage approach: broad vector retrieval followed by a cross-encoder that re-scores candidates for precision — typically adding 10–30% accuracy","B) A system that re-ranks query results alphabetically for consistency","C) A RAG variant that retrieves results from multiple databases in parallel","D) A system that lets the LLM decide which chunks to retrieve"],a:"A",e:"Re-Ranking RAG uses two stages: (1) fast vector search retrieves a broad candidate set (e.g. top-50), then (2) a cross-encoder re-ranker (e.g. Cohere Rerank, NV RerankQA) scores each candidate for true relevance and returns the top-5. The cross-encoder sees the full query+chunk pair, making it far more accurate than vector similarity alone."},
+  {s:"C",d:"Easy",t:"MCQ",learn:true,q:"What is Contextual Compression RAG?",o:["A) A RAG system that compresses the entire document before indexing","B) A RAG system that retrieves chunks and then trims them to only the portion relevant to the query before passing to the LLM","C) A RAG system that stores context between user sessions","D) A RAG system that compresses the model's parameters at inference time"],a:"B",e:"Contextual Compression RAG adds a post-retrieval step that strips irrelevant sentences from each retrieved chunk, keeping only the portion directly relevant to the query. This saves context window tokens, reduces noise for the LLM, and lowers API costs — without changing the retrieval step itself."},
+  {s:"C",d:"Easy",t:"MCQ",learn:true,q:"What is Multi-Hop RAG?",o:["A) A RAG system that retrieves from multiple vector databases simultaneously","B) A RAG system that chains multiple retrieval steps, where each answer informs the next query, enabling complex multi-part reasoning","C) A RAG system that hops between different LLMs for generation","D) A RAG system that uses graph traversal to find related entities"],a:"B",e:"Multi-Hop RAG handles questions that cannot be answered from a single document chunk. It chains retrievals: the answer to step 1 becomes the query for step 2, and so on. Example: 'Which of our suppliers are affected by this regulation?' requires first finding the regulation, then finding which suppliers it applies to."},
+  {s:"C",d:"Easy",t:"MCQ",learn:true,q:"What is Graph RAG and when is it most useful?",o:["A) RAG that uses a bar chart to rank retrieved chunks","B) RAG that builds a knowledge graph over documents and retrieves via graph traversal — best for relational reasoning across entities","C) RAG that uses GraphQL to query a database","D) RAG that plots retrieval scores on a graph for debugging"],a:"B",e:"Graph RAG builds a knowledge graph where documents become nodes and relationships become edges. Retrieval uses graph traversal rather than vector similarity. This excels at questions requiring relational reasoning — e.g. 'which orders are affected by this supplier delay?' — which would need multiple expensive SQL JOINs in a traditional setup."},
+  {s:"C",d:"Easy",t:"MCQ",learn:true,q:"What is Agentic RAG?",o:["A) RAG that automatically trains a new model when knowledge gaps are found","B) RAG where an agent dynamically decides when and how to retrieve, can retry, reformulate queries, and call multiple tools","C) RAG that uses a fixed retrieval schedule (e.g. hourly updates)","D) RAG where the user must manually approve each retrieval step"],a:"B",e:"Agentic RAG replaces the fixed retrieval pipeline with an AI agent that reasons about what it needs. The agent can decide to search again if the first result is insufficient, reformulate the query, call different tools, or combine results from multiple sources. It's the most flexible but also the most unpredictable variant."},
+  {s:"C",d:"Easy",t:"MCQ",learn:true,q:"What is Hybrid Retrieval RAG?",o:["A) A RAG system that alternates between fine-tuning and retrieval each session","B) A RAG system that combines BM25 keyword search with dense vector search to catch both exact-match and semantic-match cases","C) A RAG system that retrieves from both structured databases and unstructured documents","D) A RAG system that uses two different LLMs — one for retrieval, one for generation"],a:"B",e:"Hybrid Retrieval RAG runs both BM25 (sparse, keyword-based scoring — the classic search engine algorithm) and dense vector search in parallel, then merges the results. BM25 catches exact keyword matches that vector search might miss; dense vectors catch semantic matches that BM25 misses. Together they cover both failure modes."},
+  {s:"C",d:"Easy",t:"MCQ",learn:true,q:"What is Memory-Augmented RAG?",o:["A) RAG that stores model weights between sessions to avoid cold starts","B) RAG that maintains a memory layer of past conversation turns and retrieved chunks, enabling coherent multi-session interactions","C) RAG that uses the model's in-weights training memory instead of retrieval","D) RAG that caches all responses to avoid repeated LLM calls"],a:"B",e:"Memory-Augmented RAG adds a persistent memory store alongside the vector index. Past conversations, user preferences, and previously retrieved chunks are stored and retrieved in future sessions. This allows the system to say 'last time we discussed X' and build on prior context — essential for long-running enterprise workflows."},
+  {s:"E",d:"Easy",t:"MCQ",learn:true,q:"What is AutoGen and what is it best suited for?",o:["A) A data-centric framework best for RAG-heavy applications — built by Meta","B) A conversation-based multi-agent framework by Microsoft where agents communicate through structured dialogue — best for code generation and research tasks with human-in-the-loop","C) A role-based framework with Crew→Agents→Tasks hierarchy — best for process automation","D) A JVM/Java port of LangChain for enterprise backends"],a:"B",e:"AutoGen (Microsoft) structures multi-agent collaboration as a conversation: agents send messages to each other, each responding based on its role and the dialogue history. It's particularly strong at code generation (one agent writes, another reviews, another tests) and research tasks where human feedback can be injected mid-conversation."},
+  {s:"E",d:"Easy",t:"MCQ",learn:true,q:"What is CrewAI and what is it best suited for?",o:["A) A conversation-based framework where agents debate to reach consensus","B) A stateful graph execution framework for cyclic agent workflows","C) A role-based multi-agent framework with a Crew→Agents→Tasks hierarchy — best for process automation with clear division of labour","D) An enterprise .NET/Python SDK with native Azure integration"],a:"C",e:"CrewAI structures agents as a 'crew' with defined roles (e.g. researcher, writer, reviewer), each assigned specific tasks within a hierarchy. Agents collaborate sequentially or in parallel according to the task graph. Best for workflows with clear job roles — like automated content production, procurement processes, or research pipelines."},
+  {s:"E",d:"Easy",t:"MCQ",learn:true,q:"What is the difference between LangChain and LangGraph?",o:["A) LangChain is for Python; LangGraph is for JavaScript","B) LangChain provides compositional chains and tool use; LangGraph adds stateful graph execution for cyclic agent workflows that need to loop back","C) LangChain is open source; LangGraph is a paid enterprise product","D) LangChain handles retrieval; LangGraph handles generation"],a:"B",e:"LangChain is a framework for composing LLM calls, tools, and memory into sequential pipelines ('chains'). LangGraph extends it by representing agent workflows as directed graphs with nodes (steps) and edges (transitions), including cycles — so an agent can loop, retry, or branch based on intermediate results. LangGraph is what you use when your pipeline is not a straight line."},
+  {s:"E",d:"Easy",t:"MCQ",learn:true,q:"What is LlamaIndex and what is it best suited for?",o:["A) A Microsoft enterprise SDK with Azure integration — best for .NET backends","B) A data-centric framework that excels at connecting agents to structured and unstructured data sources — best for RAG-heavy agentic applications","C) A conversation-based framework where agents communicate through messages","D) A Java port of LangChain for JVM enterprise backends"],a:"B",e:"LlamaIndex specialises in data ingestion, indexing, and retrieval. It provides 100+ data connectors (databases, PDFs, APIs, Notion, Salesforce, etc.), multiple index types (vector, keyword, knowledge graph), and query engines. Best choice when the primary bottleneck is connecting an agent to complex, heterogeneous enterprise data sources."},
+  {s:"E",d:"Easy",t:"MCQ",learn:true,q:"What is Semantic Kernel and what is it best suited for?",o:["A) A data-centric RAG framework by Google — best for search applications","B) A conversation-based framework by OpenAI for research agents","C) Microsoft's enterprise-grade .NET/Python SDK with native Azure and OpenAI integration — best for production enterprise deployments in the Microsoft ecosystem","D) A role-based framework with Crew→Agents→Tasks hierarchy for process automation"],a:"C",e:"Semantic Kernel is Microsoft's production-grade AI orchestration SDK. It provides built-in connectors to Azure OpenAI, Azure Cognitive Search, and Microsoft Graph; a plugin architecture for tool use; and enterprise features like telemetry and responsible AI filters. The natural choice for organisations already in the Microsoft/Azure ecosystem."},
+  {s:"E",d:"Easy",t:"MCQ",learn:true,q:"What is LangChain4j and why was it developed?",o:["A) A Java port of LangChain — developed to enable JVM-based enterprise backends to use AI agent capabilities without Python infrastructure","B) The fourth version of LangChain with enhanced graph execution","C) A JavaScript version of LangChain for frontend applications","D) A LangChain extension specifically for the healthcare industry"],a:"A",e:"LangChain4j is a community-maintained Java port of LangChain concepts, including chains, memory, tools, and RAG pipelines. It exists because a large portion of enterprise backends run on Java/JVM (Spring Boot, Quarkus), and requiring Python infrastructure for AI integration adds operational complexity. LangChain4j lets Java developers build AI-powered features without context-switching to Python."},
+  {s:"D",d:"Easy",t:"MCQ",learn:true,q:"What is in-context memory in an AI agent?",o:["A) Memory stored in a graph database for long-term retrieval","B) Memory of learned action sequences the agent has performed before","C) The active content within the agent's current context window — limited to the ongoing conversation and any retrieved content in this session","D) A persistent log of all past interactions across sessions"],a:"C",e:"In-context memory is simply everything currently loaded into the agent's context window: the system prompt, conversation history, retrieved chunks, and tool outputs from this session. It disappears when the session ends. It's the fastest to access but the most limited — bounded by the model's token limit."},
+  {s:"D",d:"Easy",t:"MCQ",learn:true,q:"What is episodic memory in an AI agent?",o:["A) Memory of specific facts and their relationships stored as a knowledge graph","B) Memory of learned action sequences and how-to procedures","C) A persistent log of past interaction sessions — what happened, what was decided, what outcomes resulted — allowing agents to recall prior experiences","D) The active content in the agent's current context window"],a:"C",e:"Episodic memory stores records of past events — conversations, decisions, and their outcomes — in a persistent store (often a vector database). When a new session starts, relevant past episodes are retrieved and injected into context. This is what allows an agent to say 'the last time you asked about supplier X, we identified these issues'."},
+  {s:"D",d:"Easy",t:"MCQ",learn:true,q:"What is semantic memory in an AI agent?",o:["A) Memory of the sequence of actions the agent has taken in past workflows","B) Memory of facts, concepts, and their relationships — typically stored as a knowledge graph — representing what the agent 'knows' about the world","C) The content currently active in the agent's context window","D) A log of past conversation sessions stored for future retrieval"],a:"B",e:"Semantic memory is the agent's long-term knowledge store: facts, entity relationships, and domain concepts represented as a graph or structured store. Example: 'Supplier X is based in Germany, supplies component Y, and is approved by procurement.' This knowledge persists across sessions and is retrieved relationally — which is why graph databases outperform relational databases for this purpose."},
+  {s:"D",d:"Easy",t:"MCQ",learn:true,q:"What is procedural memory in an AI agent?",o:["A) A log of past conversations and their outcomes","B) Facts and entity relationships stored in a knowledge graph","C) The active content in the agent's current context window","D) Learned action sequences — 'how to do things' — such as the steps to complete a purchase order approval or run a reconciliation"],a:"D",e:"Procedural memory stores learned workflows and action sequences — the agent's equivalent of 'muscle memory'. Example: after completing 50 invoice reconciliations, the agent has encoded the optimal sequence of steps. This memory type is what turns an agent from a tool-caller into a skilled practitioner that improves with experience."},
+  {s:"F",d:"Easy",t:"MCQ",learn:true,q:"What happens during the Pre-training stage of an LRM?",o:["A) The model is fine-tuned on domain-specific labelled examples","B) The model learns to reason coherently through reinforcement learning rewards","C) The model's capability is compressed into a smaller deployable version","D) The model learns general world knowledge by predicting the next token across massive, diverse text corpora"],a:"D",e:"Pre-training is the foundational stage where the model processes billions of tokens from books, web pages, code, and scientific papers — learning language, facts, reasoning patterns, and world knowledge purely through next-token prediction. No labels, no instructions. This stage is the most compute-intensive and produces the base model that subsequent stages then specialise."},
+  {s:"F",d:"Easy",t:"MCQ",learn:true,q:"What is Supervised Fine-Tuning (SFT) in LRM training?",o:["A) Training the model to reason coherently by rewarding correct answers and logical reasoning chains","B) Compressing the large trained model into a smaller, deployable version","C) The second training stage where the pre-trained model is adapted to a specific domain using labelled input-output examples","D) The initial stage where the model learns general knowledge from massive text corpora"],a:"C",e:"Supervised Fine-Tuning (SFT) is stage 2 of LRM training. Human annotators create examples of good responses — including step-by-step reasoning — and the model is trained to replicate them. SFT teaches the model the expected format, tone, and domain focus. It's much cheaper than pre-training but still requires quality labelled data."},
+  {s:"F",d:"Easy",t:"MCQ",learn:true,q:"What role does Reinforcement Learning play in LRM training?",o:["A) It retrieves relevant training examples from a vector database during training","B) It compresses the trained model into a smaller version for deployment","C) It rewards the model for correct final answers AND coherent intermediate reasoning chains — teaching genuine deliberation rather than pattern-matching","D) It adapts the model to a specific domain using labelled examples"],a:"C",e:"RL is stage 3 of LRM training and is the key innovation that distinguishes LRMs from LLMs. The model generates reasoning chains and final answers; a reward model scores both the answer correctness and the logical coherence of the steps. This teaches the model to genuinely think through problems rather than pattern-match to the most likely surface-level answer."},
+  {s:"F",d:"Easy",t:"MCQ",learn:true,q:"What is Knowledge Distillation in LRM training?",o:["A) The process of retrieving knowledge from external databases during inference","B) The fourth training stage where the large trained model's capability is compressed into a smaller, economically deployable model","C) The process of removing irrelevant knowledge from the model's weights","D) A technique for injecting domain knowledge into a pre-trained model using labelled examples"],a:"B",e:"Knowledge Distillation is stage 4 — the final step before production deployment. The large LRM (the 'teacher') generates responses, and a smaller model (the 'student') is trained to replicate them. The student model ends up with most of the teacher's reasoning capability at a fraction of the compute cost. This is what makes enterprise deployment economically viable."},
+  {s:"A",d:"Easy",t:"MCQ",learn:true,q:"What is ANI (Artificial Narrow Intelligence)?",o:["A) A hypothetical AI that surpasses human intelligence across all domains","B) A hypothetical AI that can learn any intellectual task a human can and transfer knowledge across domains","C) AI that performs one specific task well — every commercially deployed AI system in 2026, including ChatGPT, Siri, and AlphaFold","D) AI that can understand and generate any form of human language"],a:"C",e:"ANI is the only form of AI that actually exists today. It excels at a single defined task (image recognition, language generation, protein folding) but cannot transfer that capability to a different domain. ChatGPT seems general but it's a very sophisticated ANI — it cannot learn to drive a car from its chess experience, for instance."},
+  {s:"A",d:"Easy",t:"MCQ",learn:true,q:"What is AGI (Artificial General Intelligence)?",o:["A) AI that has already been achieved by several leading labs and is now in limited deployment","B) A hypothetical AI that can learn any intellectual task a human can, transfer knowledge across domains, and continuously improve itself — not yet achieved","C) AI that surpasses human intelligence across all domains simultaneously","D) An advanced form of ANI that handles multiple tasks within a single domain"],a:"B",e:"AGI is the next major milestone in AI development — a system with human-level learning ability that can transfer knowledge across completely different domains (like a human who learns chess strategy and applies it to business negotiation). As of mid-2026, no system has demonstrated AGI. It requires AGI as a prerequisite before ASI becomes possible."},
+  {s:"A",d:"Easy",t:"MCQ",learn:true,q:"What is ASI (Artificial Super Intelligence)?",o:["A) A current AI system that surpasses human intelligence in specific domains","B) The stage of AI just before AGI — a highly capable but still narrow system","C) A theoretical AI that surpasses human intelligence across ALL domains simultaneously — requires AGI as a prerequisite and is primarily a safety and governance concern","D) An advanced reasoning model that uses significantly more compute at inference time"],a:"C",e:"ASI is a theoretical construct — an AI smarter than the best humans across every intellectual domain simultaneously. It requires AGI as a stepping stone (you can't be superhuman before you're human-level). ASI is primarily discussed in the context of AI safety and governance because the implications of a system more capable than humanity in every respect are profound and unpredictable."},
+  {s:"A",d:"Easy",t:"MCQ",learn:true,q:"What does the Lead-to-Cash (L2C) process flow cover?",o:["A) The procurement cycle from purchase requisition to supplier payment","B) The HR cycle from recruitment to employee offboarding","C) The complete sales cycle from initial marketing contact through lead, opportunity, quote, order, to cash collection","D) The financial close process from data collection to statutory reporting"],a:"C",e:"Lead-to-Cash (L2C) covers the entire revenue-generation process: Contact→Lead→Opportunity→Quote→Order→Cash. It spans Marketing (lead generation), Sales (opportunity and quote management), and Finance (order fulfilment and cash collection). AI agents in L2C automate lead scoring, proposal generation, and revenue forecasting."},
+  {s:"A",d:"Easy",t:"MCQ",learn:true,q:"What does the Source-to-Pay (S2P) process flow cover?",o:["A) The sales cycle from initial contact to cash collection","B) The end-to-end procurement cycle: Purchase Requisition → Sourcing → Supplier Selection → PO → Goods Receipt → 3-Way Match → Payment → Supplier Review","C) The HR lifecycle from recruitment to retirement","D) The financial reporting cycle from data collection to statutory publication"],a:"B",e:"Source-to-Pay covers all procurement activities from identifying a need to paying a supplier. The 3-Way Match step (comparing PO, Goods Receipt Note, and Invoice) is the highest-value automation target — AI can reduce its cycle time by 60–80%. S2P spans Finance, Supply Chain, and Procurement modules."},
+  {s:"A",d:"Easy",t:"MCQ",learn:true,q:"What does the Hire-to-Retire (H2R) process flow cover?",o:["A) The procurement cycle from supplier sourcing to contract expiry","B) The complete HR lifecycle from recruitment and onboarding through employment to offboarding or retirement","C) The product lifecycle from design to end-of-life","D) The customer lifecycle from first contact to churn"],a:"B",e:"Hire-to-Retire (H2R) manages the entire employee journey: Job Requisition→Recruitment→Onboarding→Payroll→Performance Management→Learning & Development→Offboarding/Retirement. AI agents automate CV screening, payroll queries, policy questions, and offboarding checklists — all within the HR module."},
+  {s:"A",d:"Easy",t:"MCQ",learn:true,q:"What does the Record-to-Report (R2R) process flow cover?",o:["A) Recording customer complaints and reporting resolution rates","B) The procurement audit trail from PO creation to payment recording","C) The financial accounting cycle from transaction recording through consolidation and reconciliation to financial statement publication","D) Recording system events and reporting security incidents"],a:"C",e:"Record-to-Report covers all financial close activities: Journal Entry→General Ledger→Intercompany Reconciliation→Consolidation→Trial Balance→Financial Statements→Management Reporting→Statutory Filing. AI agents automate anomaly detection in journal entries, intercompany matching, and variance commentary generation."},
+  {s:"A",d:"Easy",t:"MCQ",learn:true,q:"What does the Forecast-to-Fulfill (F2F) process flow cover?",o:["A) The financial forecasting cycle from budget to actual reporting","B) The demand sensing and supply chain cycle from demand forecasting through inventory planning to order fulfilment","C) The product development cycle from concept to market launch","D) The customer service cycle from complaint to resolution"],a:"B",e:"Forecast-to-Fulfill spans the supply chain planning and execution cycle: Demand Sensing→Demand Forecasting→Inventory Planning→Production Planning→Procurement→Warehousing→Order Management→Fulfilment→Returns. AI agents improve demand forecast accuracy using external signals (weather, events, economic indicators) beyond historical sales data."},
+  {s:"A",d:"Easy",t:"MCQ",learn:true,q:"What does the Issue-to-Resolution (I2R) process flow cover?",o:["A) The procurement process from supplier issue identification to contract resolution","B) The IT security process from vulnerability detection to patch deployment","C) The customer service and support cycle from issue or complaint receipt through investigation to resolution and closure","D) The financial audit process from issue identification to remediation"],a:"C",e:"Issue-to-Resolution covers customer support: Issue Capture→Categorisation→Assignment→Investigation→Resolution→Verification→Closure→Root Cause Analysis. AI agents handle Tier 1 issues autonomously (FAQ-style queries), route complex issues to specialists, and generate resolution summaries. Connected to the Customer Relationship module."},
+  {s:"A",d:"Easy",t:"MCQ",learn:true,q:"What does the Request-to-Service (R2S) process flow cover?",o:["A) The IT service management cycle from service request submission through approval, fulfilment, and closure","B) The customer complaint cycle from submission to resolution","C) The procurement cycle from purchase request to supplier delivery","D) The sales cycle from customer enquiry to contract signature"],a:"A",e:"Request-to-Service covers IT Service Management (ITSM) and shared services: Service Request→Approval Workflow→Fulfilment→Delivery→Closure. Examples include requesting a new laptop, software access, or an HR policy exception. AI agents automate approval routing, status updates, and common fulfilment steps."},
+  {s:"A",d:"Easy",t:"MCQ",learn:true,q:"What does the Invoice-to-Pay (I2P) process flow cover?",o:["A) The full procurement cycle from purchase requisition to supplier payment","B) The narrower accounts payable cycle focused specifically on receiving invoices, validating them, and executing payment to suppliers","C) The customer billing cycle from invoice generation to cash collection","D) The financial reporting cycle from invoice data to management accounts"],a:"B",e:"Invoice-to-Pay is the accounts payable subset of Source-to-Pay: Invoice Receipt→Data Extraction (OCR/AI)→Validation→3-Way Match→Exception Handling→Approval→Payment Execution→Reconciliation. While S2P covers the full procurement cycle, I2P focuses specifically on the invoice processing and payment execution steps where AI automation is most impactful."},
+  {s:"A",d:"Easy",t:"MCQ",learn:true,q:"What does the Design-to-Build (D2B) process flow cover?",o:["A) The customer experience design cycle from research to prototype testing","B) The product lifecycle from concept, design, and engineering through manufacturing and quality control to production","C) The software development cycle from requirements to code deployment","D) The marketing cycle from brand strategy to campaign execution"],a:"B",e:"Design-to-Build covers product creation and manufacturing: Concept→Requirements→Engineering Design→Prototype→Testing→Bill of Materials→Manufacturing Planning→Production→Quality Control→Release. AI agents support design validation, BOM optimisation, defect detection (computer vision), and production scheduling within the Supply Chain module."},
+  {s:"A",d:"Easy",t:"MCQ",learn:true,q:"What is the role of the Financial Management module in the enterprise AI architecture?",o:["A) To manage customer relationships and revenue forecasting","B) To manage procurement and supplier relationships","C) To plan, monitor, and control the organisation's financial resources — including accounting, treasury, tax, and financial reporting — led by the CFO","D) To manage workforce planning, payroll, and HR processes"],a:"C",e:"The Financial Management module (System of Control, led by CFO) covers: General Ledger, Accounts Payable/Receivable, Treasury, Tax, Financial Planning & Analysis, and Financial Reporting. AI agents in this module automate reconciliations, anomaly detection, cash flow forecasting, and regulatory reporting. Connected processes: Record-to-Report, Invoice-to-Pay."},
+  {s:"A",d:"Easy",t:"MCQ",learn:true,q:"What is the role of the Supply Chain module in the enterprise AI architecture?",o:["A) To manage customer acquisition and retention","B) To manage the flow of goods and materials from suppliers through production to customers — including planning, logistics, and inventory","C) To manage employee lifecycle from hiring to retirement","D) To manage financial accounting and regulatory reporting"],a:"B",e:"The Supply Chain module (System of Visibility, led by COO) covers: Demand Planning, Inventory Management, Procurement (operational), Logistics, Warehousing, and Order Management. AI agents use demand sensing, route optimisation, and exception management to reduce costs and improve service levels. Connected processes: Forecast-to-Fulfill, Design-to-Build."},
+  {s:"A",d:"Easy",t:"MCQ",learn:true,q:"What is the role of the Customer Relationship module in the enterprise AI architecture?",o:["A) To manage internal financial controls and compliance","B) To manage all customer-facing activities including sales, marketing, service, and customer experience — the System of Experience","C) To manage procurement and supplier negotiations","D) To manage sustainability reporting and ESG compliance"],a:"B",e:"The Customer Relationship module (System of Experience, led by CRO/CMO) covers: Marketing Automation, Sales Force Automation, Customer Service, and Customer Experience Management. AI agents personalise marketing, score leads, automate service tickets, and predict churn. Connected processes: Lead-to-Cash, Issue-to-Resolution."},
+  {s:"A",d:"Easy",t:"MCQ",learn:true,q:"What is the role of the Sustainability module in the enterprise AI architecture?",o:["A) To manage long-term strategic planning and board governance","B) To manage IT infrastructure and data centre operations","C) To track, measure, and report on the organisation's environmental, social, and governance (ESG) performance — increasingly driven by regulatory requirements","D) To manage all financial transactions and treasury operations"],a:"C",e:"The Sustainability module (led by CSO — Chief Sustainability Officer) covers: Carbon Footprint Tracking, ESG Reporting, Supply Chain Sustainability, Energy Management, and Circular Economy initiatives. AI agents automate data collection from suppliers, calculate Scope 1/2/3 emissions, and generate regulatory reports (CSRD, SEC climate disclosure). A relatively new module driven by regulatory pressure."},
+  {s:"B",d:"Easy",t:"MCQ",learn:true,q:"What is the self-attention mechanism in a transformer?",o:["A) A mechanism where the model pays equal attention to all tokens in the sequence","B) A mechanism where each token simultaneously calculates how relevant every other token in the sequence is to it — enabling full context understanding in a single pass","C) A mechanism that focuses only on the immediately preceding tokens, similar to an RNN","D) A mechanism where a separate attention model scores candidate outputs before the main model generates"],a:"B",e:"Self-attention allows each token to 'look at' every other token simultaneously and decide how much to weight each one when computing its own representation. This is what enables transformers to capture long-range dependencies (e.g. a pronoun and the noun it refers to 50 words earlier) in a single forward pass — something RNNs struggled with because they processed tokens sequentially."},
+  {s:"B",d:"Easy",t:"MCQ",learn:true,q:"What is the difference between encoder-only and decoder-only transformer models?",o:["A) Encoder-only models are larger; decoder-only models are faster but less accurate","B) Encoder-only models (e.g. BERT) build rich representations of input text for understanding tasks; decoder-only models (e.g. GPT) generate text auto-regressively token by token","C) Encoder-only models are for images; decoder-only models are for text","D) Encoder-only models require fine-tuning; decoder-only models work zero-shot only"],a:"B",e:"Encoder-only models (BERT, RoBERTa) process the full input bidirectionally and output rich embeddings — ideal for classification, NER, semantic search, and question answering. Decoder-only models (GPT-4, Claude, Llama) predict the next token from all previous tokens — ideal for text generation, chat, and completion. Encoder+Decoder (T5, BART) handle sequence-to-sequence tasks like translation."},
+  {s:"B",d:"Easy",t:"MCQ",learn:true,q:"What is BPE (Byte Pair Encoding) and why does it matter?",o:["A) A compression algorithm that reduces model parameter size by merging similar weights","B) A sub-word tokenisation algorithm that iteratively merges the most frequent character pairs — making vocabulary size manageable while handling rare and compound words","C) A training technique that batches training examples by processing pairs of sentences together","D) A decoding strategy that generates two candidate tokens at each step and selects the better one"],a:"B",e:"BPE starts with individual characters and repeatedly merges the most frequent adjacent pair into a single token, building up a vocabulary of sub-word units. 'unbelievable' might become 'un', '##believ', '##able'. This lets models handle any word (including new ones) without needing a word in the vocabulary, while keeping common words as single tokens for efficiency. Token count = API cost — understanding BPE helps engineers design cost-efficient prompts."},
+  {s:"B",d:"Easy",t:"MCQ",learn:true,q:"What is an embedding space in the context of LLMs?",o:["A) The physical GPU memory used to store model weights during inference","B) A high-dimensional vector space where words and sentences are represented as points — where geometric proximity encodes semantic similarity","C) The fixed-size context window that the model uses to process text","D) A compressed representation of the training data used during fine-tuning"],a:"B",e:"An embedding space maps discrete tokens to continuous high-dimensional vectors (e.g. 1536 dimensions). Words with similar meanings cluster together geometrically — 'king' and 'queen' are close, 'cat' and 'dog' are close but far from 'invoice'. Arithmetic captures analogies: king − man + woman ≈ queen. The space is language-agnostic — 'chat' (French) and 'cat' (English) end up near each other. This is the foundation of semantic search."},
+  {s:"B",d:"Easy",t:"MCQ",learn:true,q:"What is LoRA (Low-Rank Adaptation) and how does it work?",o:["A) A technique that trains a completely new model from scratch on domain-specific data","B) A fine-tuning technique that freezes the original model weights and injects small trainable low-rank matrices into the model layers — reducing trainable parameters by ~10,000×","C) A retrieval technique that adapts the query to match the document index format","D) A compression technique that reduces the model's context window size for faster inference"],a:"B",e:"LoRA works by decomposing the weight update matrix into two small matrices (A × B where rank r ≪ d). Only these small matrices are trained; the original weights are frozen. A 7B parameter model might have 7 billion parameters but LoRA trains only ~700,000. This makes domain adaptation economically viable — you can fine-tune a large model on a single GPU in hours rather than running a full training job."},
+  {s:"B",d:"Easy",t:"MCQ",learn:true,q:"What are the 8 stages of the LLM production deployment pipeline?",o:["A) Training → Validation → Testing → Staging → Production → Monitoring → Retraining → Retirement","B) Data ingestion → Pre-processing → Embedding → Indexing → Query processing → Retrieval → Re-ranking → Generation","C) Tokenisation → Encoding → Attention → Feed-forward → Decoding → Output → Filtering → Logging","D) Collection → Cleaning → Chunking → Embedding → Storage → Search → Ranking → Response"],a:"B",e:"The 8-stage pipeline maps the journey from raw documents to a generated response: (1) Data ingestion — load documents; (2) Pre-processing — clean and structure; (3) Embedding — convert to vectors; (4) Indexing — store in vector DB; (5) Query processing — embed the user's query; (6) Retrieval — find similar chunks; (7) Re-ranking — precision filter; (8) Generation — LLM produces the final answer. Each stage can fail independently."},
+  {s:"E",d:"Easy",t:"MCQ",learn:true,q:"What is an Agent Card in the A2A protocol?",o:["A) A physical security token that authenticates an agent to enterprise systems","B) A JSON-LD descriptor that advertises an agent's capabilities, input/output schemas, and trust requirements — the machine-readable 'business card' that enables agent discovery without manual configuration","C) A dashboard card in the enterprise UI that shows an agent's current task status","D) A credit-card-sized hardware device used to authorise high-value agent actions"],a:"B",e:"Agent Cards are the discovery mechanism of A2A. Each agent publishes a JSON-LD file describing: what tasks it can handle, what inputs it expects, what outputs it returns, what trust level it requires, and how to call it (endpoint, protocol). Another agent reads the card and knows how to delegate without any human configuration. This is what makes large-scale multi-agent orchestration manageable."},
+  {s:"E",d:"Easy",t:"MCQ",learn:true,q:"What are the three layers of the A2A specification?",o:["A) Authentication layer → Authorisation layer → Execution layer","B) Data model layer (task/result/error types) → Operations layer (create/update/cancel/status) → Protocol bindings layer (HTTP/REST, gRPC, WebSocket)","C) Discovery layer → Negotiation layer → Communication layer","D) Perception layer → Decision layer → Action layer"],a:"B",e:"The A2A spec has three layers: (1) Data model — defines the standard types for tasks, results, errors, and metadata so any two agents share a common vocabulary; (2) Operations — defines the standard actions (create task, update task, cancel task, check status) so agents know how to manage work; (3) Protocol bindings — specifies how to carry these operations over HTTP/REST (synchronous), gRPC (efficient binary), or WebSocket (real-time streaming)."},
+  {s:"E",d:"Easy",t:"MCQ",learn:true,q:"What are the six goals of the A2A protocol?",o:["A) Speed, Accuracy, Scalability, Security, Cost-efficiency, Explainability","B) Discoverability, Delegation, Trust, Observability, Interoperability, Fault tolerance","C) Authentication, Authorisation, Encryption, Logging, Monitoring, Recovery","D) Planning, Reasoning, Memory, Tool use, Learning, Coordination"],a:"B",e:"The six A2A goals: Discoverability (agents find each other via Agent Cards), Delegation (agents assign sub-tasks to specialist agents), Trust (mutual authentication and scoped permissions), Observability (every action is logged and traceable), Interoperability (any framework's agents can work together), Fault tolerance (the system handles agent failures gracefully without losing work)."},
+  {s:"E",d:"Easy",t:"MCQ",learn:true,q:"What are the three A2A protocol bindings and when is each used?",o:["A) JSON, XML, and CSV — chosen based on the data volume","B) Python, JavaScript, and Java — chosen based on the agent's programming language","C) HTTP/REST (synchronous request-response), gRPC (efficient binary for high-throughput), and WebSocket (real-time streaming for live updates)","D) Email, Slack, and SMS — chosen based on the urgency of the task"],a:"C",e:"A2A supports three transport options: HTTP/REST is the universal default — simple, widely supported, easy to debug; gRPC uses Protocol Buffers for compact binary encoding — better for high-throughput agent-to-agent calls where bandwidth matters; WebSocket maintains a persistent connection for real-time streaming — best when an agent needs live updates (e.g. monitoring a long-running process and reporting progress)."},
+  {s:"D",d:"Easy",t:"MCQ",learn:true,q:"What does MCP (Model Context Protocol) enable and why is it analogous to USB?",o:["A) MCP enables model-to-model communication — like USB enables devices to share power","B) MCP provides a standardised protocol for AI models to discover and invoke external tools — like USB provides a universal connector so any device works with any port without bespoke adapters","C) MCP enables models to share weights across different hardware — like USB enables file transfer","D) MCP is a security protocol that encrypts model outputs before returning them to users"],a:"B",e:"Before MCP, integrating an LLM with a CRM required writing bespoke code for that specific CRM. Integrating with a calendar required different bespoke code, and so on. MCP standardises this: the model calls a standard 'invoke tool' operation; the MCP server translates that into whatever the specific system needs. Just as USB means you don't need a different cable for every device, MCP means you don't need a different integration for every tool."},
+  {s:"D",d:"Easy",t:"MCQ",learn:true,q:"What are MCP tool manifests and what do they enable?",o:["A) Security certificates that authenticate an agent's identity to enterprise systems","B) Configuration files that define which users are allowed to invoke which tools","C) Machine-readable descriptions of a tool's name, parameters, and expected outputs — enabling models to discover what tools are available and how to call them without hardcoded integrations","D) Audit logs of all tool invocations for compliance and debugging purposes"],a:"C",e:"An MCP tool manifest is a JSON document that describes a tool: its name, what it does, what parameters it accepts (types, required vs optional), and what it returns. The model reads the manifest and knows how to use the tool — no hardcoding required. This makes tool discovery dynamic: as new tools are added or updated, the model automatically knows about them without redeployment."},
+  {s:"D",d:"Easy",t:"MCQ",learn:true,q:"What is the difference between MCP and A2A?",o:["A) MCP is for open-source models; A2A is for commercial models","B) MCP connects a model to tools and external systems; A2A connects agents to other specialised agents — they are complementary, not competing","C) MCP is synchronous; A2A is asynchronous — they solve the same problem at different speeds","D) MCP is developed by Anthropic; A2A is developed by Google — they are competing standards"],a:"B",e:"MCP handles the model-to-tool layer: how a single agent accesses CRMs, databases, calendars, and APIs. A2A handles the agent-to-agent layer: how a Finance agent delegates a tax calculation to a specialist Tax agent, which delegates data retrieval to a Data agent. In a production enterprise system, both are present: MCP gives agents their individual capabilities; A2A coordinates those capable agents into a workforce."},
+  {s:"F",d:"Easy",t:"MCQ",learn:true,q:"What is deductive reasoning and how do LRMs use it?",o:["A) Reasoning from observations to the most likely explanation — used when the cause of an outcome is unknown","B) Reasoning from specific examples to general rules — used when learning patterns from data","C) Reasoning from established general rules to specific conclusions — used when the rules are known and the answer follows necessarily","D) Reasoning that considers all possible hypotheses simultaneously and eliminates them one by one"],a:"C",e:"Deductive reasoning moves from general rules to specific conclusions with logical certainty. Example: Rule: 'All invoices over €50,000 require dual approval.' Fact: 'This invoice is €75,000.' Conclusion: 'This invoice requires dual approval.' LRMs use deductive reasoning when applying known business rules, regulations, or policies to specific cases — the conclusion is guaranteed if the premises are true."},
+  {s:"F",d:"Easy",t:"MCQ",learn:true,q:"What is inductive reasoning and how do LRMs use it?",o:["A) Reasoning from general rules to specific conclusions with logical certainty","B) Reasoning from specific observations or examples to general rules or patterns — conclusions are probable, not certain","C) Reasoning that finds the best explanation for a set of observations","D) Reasoning that applies formal logic proofs to verify conclusions step by step"],a:"B",e:"Inductive reasoning moves from specific examples to general patterns. Example: 'Invoices from Supplier X have been late 8 out of 10 times' → 'Supplier X is probably unreliable.' The conclusion is probabilistic — it could be wrong. LRMs use inductive reasoning when identifying patterns in business data, generating hypotheses, or making forecasts. It's the reasoning mode behind machine learning itself."},
+  {s:"F",d:"Easy",t:"MCQ",learn:true,q:"What is abductive reasoning and how do LRMs use it?",o:["A) Reasoning from general rules to specific conclusions with logical certainty","B) Reasoning from specific examples to general rules or patterns","C) Finding the most likely explanation that accounts for a set of observations — 'inference to the best explanation'","D) Reasoning that eliminates all incorrect hypotheses until only one remains"],a:"C",e:"Abductive reasoning finds the best explanation for observations. Example: An AI agent notices that three invoices from different suppliers all arrived late this week. Abductive reasoning: 'The most likely explanation is a common upstream disruption — perhaps a logistics strike or system outage — rather than three independent supplier failures.' LRMs use abduction for root cause analysis, anomaly investigation, and diagnostic reasoning."},
+  {s:"G",d:"Easy",t:"MCQ",learn:true,q:"What is the Purchase Requisition step in the Source-to-Pay process?",o:["A) The step where the supplier sends an invoice for goods delivered","B) The step where goods or services are physically received and inspected","C) The internal request submitted by an employee or department to procure goods or services — the trigger that initiates the entire S2P process","D) The step where the procurement team negotiates terms with shortlisted suppliers"],a:"C",e:"The Purchase Requisition (PR) is the starting gun of S2P. An internal stakeholder identifies a need (e.g. 'we need 500 units of component Y') and submits a formal request through the ERP system. AI agents validate the request against budget, check if existing contracts cover it, and route it for approval — transforming what was a manual paper process into an automated workflow."},
+  {s:"G",d:"Easy",t:"MCQ",learn:true,q:"What is the Sourcing step (RFQ/RFP) in the Source-to-Pay process?",o:["A) The step where the procurement team physically inspects received goods","B) The step where approved purchase requests go to market — suppliers are invited to bid via Request for Quotation (RFQ) or Request for Proposal (RFP)","C) The step where the 3-way match between PO, goods receipt, and invoice is performed","D) The step where the final supplier payment is executed"],a:"B",e:"Sourcing is where the procurement team takes an approved PR to market. An RFQ (Request for Quotation) asks suppliers to provide pricing for a specified product — typically used for standard, commoditised items. An RFP (Request for Proposal) invites suppliers to propose a solution — used for complex services or capital goods. AI agents automate RFQ/RFP creation, supplier matching, bid analysis, and scoring."},
+  {s:"G",d:"Easy",t:"MCQ",learn:true,q:"What is the 3-Way Match in the Source-to-Pay process?",o:["A) A management review that checks supplier performance against three KPIs","B) A financial control that compares three documents — the Purchase Order, Goods Receipt Note, and Invoice — to verify accuracy before payment is authorised","C) A negotiation technique that aligns three parties: buyer, supplier, and logistics provider","D) A data quality check that compares supplier data across three systems: ERP, CRM, and procurement platform"],a:"B",e:"The 3-Way Match is the core financial control in S2P: compare PO (what was ordered and at what price), GRN/Goods Receipt Note (what was actually received), and Invoice (what the supplier is charging). All three must agree within tolerance. Discrepancies are flagged for human review. AI automation reduces 3-way match cycle time by 60–80% — from days to hours or minutes — and catches errors that manual review misses."},
+  {s:"G",d:"Easy",t:"MCQ",learn:true,q:"What is the difference between an AI Assistant and an AI Agent in an enterprise context?",o:["A) An AI Assistant uses a larger model; an AI Agent uses a smaller, faster model","B) An AI Assistant responds to queries and surfaces information but requires a human to act; an AI Agent executes process steps autonomously and only escalates exceptions","C) An AI Assistant works offline; an AI Agent requires cloud connectivity","D) An AI Assistant handles structured data; an AI Agent handles unstructured data"],a:"B",e:"This distinction determines your governance model. An AI Assistant is passive: it tells you which supplier has the best score, but you click the 'send PO' button. An AI Agent is active: it evaluates suppliers, generates the PO, routes it for approval, and logs the action — you review the summary. The agent doesn't need step-by-step instruction; the assistant does. S2P automation uses agents for the repetitive, rule-bounded steps and keeps humans for exception decisions."},
+  {s:"G",d:"Easy",t:"MCQ",learn:true,q:"What does 'cognitive work as a commodity' mean in the context of AI and AGI?",o:["A) That AI will make all jobs obsolete within the next decade","B) That if AI makes intelligence abundant and cheap — like compute or bandwidth — the economic model of knowledge-intensive industries fundamentally changes: pricing, hiring, and org design all shift","C) That AI can only perform work that follows strict cognitive rules, not creative or relational tasks","D) That human cognitive ability will be measurably reduced by AI dependence"],a:"B",e:"Today, skilled knowledge work (legal analysis, financial modelling, medical diagnosis) commands high prices because human expertise is scarce and expensive. If AGI or sufficiently advanced AI makes that cognitive work abundant and cheap — the way cloud computing made compute abundant and cheap — the economic model breaks: services get cheaper, margins compress, competitive advantage shifts from 'who has the smartest people' to 'who has the best AI integration'. This is the strategic argument for building AI infrastructure now."},
+  {s:"G",d:"Easy",t:"MCQ",learn:true,q:"What does HITL (Human-in-the-Loop) mean in enterprise AI governance?",o:["A) A governance model where AI autonomously completes all tasks and sends a weekly summary to humans","B) A governance model where a human must review and approve every individual action before the AI agent executes it — used for high-risk or irreversible actions","C) A governance model where humans train the AI model by providing feedback on its outputs","D) A governance model where the AI operates completely autonomously with no human involvement"],a:"B",e:"HITL means the agent proposes but cannot act until a human approves each step. Example: the agent identifies a €2M payment exception and flags it — but a human treasury controller must click 'approve' before any funds move. HITL maximises control at the cost of speed. Appropriate for: high-value transactions, irreversible actions, regulated decisions, novel situations outside normal parameters."},
+  {s:"G",d:"Easy",t:"MCQ",learn:true,q:"What does AITL (AI-in-the-Loop) mean in enterprise AI governance?",o:["A) A governance model where AI builds and trains other AI models autonomously","B) A governance model where a human approves every action before the AI executes it","C) A governance model where the AI executes autonomously and only escalates exceptions for human review — used for high-volume, lower-risk, rule-bounded processes","D) A governance model where multiple AI agents check each other's work before any action is taken"],a:"C",e:"AITL flips the default: the agent acts and humans review. Example: the 3-way match agent processes 500 invoices autonomously, flags 12 discrepancies for human review, and the human only touches those 12. This is how 60–80% cycle time reduction is achieved in S2P. AITL is appropriate when: actions are reversible, rules are clear, volume is high, and the cost of occasional errors is manageable. The human stays accountable but is no longer the bottleneck."},
+  {s:"F",d:"Easy",t:"MCQ",learn:true,q:"What are the seven building blocks of a research-grade AI system?",o:["A) Data, Model, Infrastructure, API, UI, Security, Monitoring","B) Foundation model, Planning layer, RAG, Tool use, Memory systems, Multi-agent systems, Evaluation & verification","C) Pre-training, SFT, RL, Distillation, Deployment, Monitoring, Retraining","D) Search, Retrieval, Ranking, Generation, Validation, Caching, Logging"],a:"B",e:"A research-grade AI system needs all seven: (1) Foundation model — the reasoning engine; (2) Planning layer — task decomposition; (3) RAG — grounds output in current knowledge; (4) Tool use — enables real-world actions; (5) Memory systems — enables continuity across queries; (6) Multi-agent — parallelises complex tasks; (7) Evaluation & verification — catches errors and hallucinations. Remove any one and the system has a significant capability gap."}
+
+];
+const ACRONYMS = [
+  {a:"AI",f:"Artificial Intelligence",d:"The broad field of building computer systems that perform tasks normally requiring human intelligence — reasoning, learning, problem-solving, and perception."},
+  {a:"ANI",f:"Artificial Narrow Intelligence",d:"AI that performs one specific task well (e.g. ChatGPT, Siri, AlphaFold). Every AI system commercially deployed in 2026 is ANI. Cannot transfer knowledge across domains."},
+  {a:"AGI",f:"Artificial General Intelligence",d:"A hypothetical AI that can learn any intellectual task a human can, transfer knowledge across domains, and improve itself continuously. Not yet achieved as of 2026."},
+  {a:"ASI",f:"Artificial Super Intelligence",d:"A theoretical AI that surpasses human intelligence across ALL domains simultaneously. Requires AGI as a prerequisite. Primarily a safety and governance concern today."},
+  {a:"LLM",f:"Large Language Model",d:"A transformer-based model trained on massive text corpora to predict the next token. Examples: GPT-4, Claude, Gemini. Passive — generates content but cannot act in external systems without an agent layer."},
+  {a:"LRM",f:"Large Reasoning Model",d:"An LLM enhanced with an explicit deliberative 'thinking layer' at inference time. Uses chain-of-thought and RL training to reason step-by-step before answering. Example: OpenAI o3."},
+  {a:"RAG",f:"Retrieval-Augmented Generation",d:"An architecture that retrieves relevant document chunks from a vector index at inference time and includes them in the LLM prompt — grounding generation in verifiable, up-to-date knowledge without retraining the model."},
+  {a:"MCP",f:"Model Context Protocol",d:"A standardised protocol (analogous to USB for hardware) that lets any AI model connect to and invoke any external tool — CRMs, calendars, databases, code execution — without bespoke integrations."},
+  {a:"A2A",f:"Agent-to-Agent Protocol",d:"A protocol enabling specialised AI agents to discover each other (via Agent Cards), delegate sub-tasks, and coordinate complex workflows without human routing. Standardised ~2025. Complementary to MCP."},
+  {a:"LoRA",f:"Low-Rank Adaptation",d:"A fine-tuning technique that injects small trainable matrices (rank r ≪ d) into a frozen model's layers. Reduces trainable parameters by ~10,000× vs full fine-tuning while preserving most capability."},
+  {a:"BPE",f:"Byte Pair Encoding",d:"A sub-word tokenisation algorithm used by most modern LLMs. Merges frequent character pairs iteratively to create a vocabulary of sub-word tokens. The main alternative is SentencePiece."},
+  {a:"CoT",f:"Chain-of-Thought",d:"A prompting technique that instructs the model to produce intermediate reasoning steps before a final answer. Dramatically improves multi-step arithmetic, logic, and planning tasks."},
+  {a:"HITL",f:"Human-in-the-Loop",d:"A governance model where a human must approve EVERY action before the AI agent executes it. Used for high-risk or irreversible operations. Contrast with AITL."},
+  {a:"AITL",f:"AI-in-the-Loop",d:"A governance model where the AI agent executes autonomously and a human reviews a summary or exceptions afterwards. Used for high-volume, lower-risk processes like 3-way match in S2P."},
+  {a:"S2P",f:"Source-to-Pay",d:"End-to-end procurement process: Purchase Requisition → Sourcing (RFQ/RFP) → Supplier Selection → PO Generation → Goods Receipt → 3-Way Match (PO/GR/Invoice) → Payment → Supplier Performance Review."},
+  {a:"ERP",f:"Enterprise Resource Planning",d:"Integrated software systems (e.g. SAP S/4HANA) that manage core business processes — Finance, Supply Chain, Procurement, HR. The 'Digital Core' that agents integrate with via MCP."},
+  {a:"GAN",f:"Generative Adversarial Network",d:"A pre-transformer architecture with two competing networks (generator vs discriminator). A key precursor to generative modelling. Largely superseded by diffusion models and LLMs for most generative tasks."},
+  {a:"BM25",f:"Best Match 25",d:"A classic keyword-based (sparse) retrieval algorithm used in search engines. Scores documents by term frequency and inverse document frequency. Combined with dense vector search in Hybrid Retrieval RAG."},
+  {a:"SFT",f:"Supervised Fine-Tuning",d:"The second stage of LRM training. Adapts the pre-trained model to a specific domain using labelled examples. Precedes Reinforcement Learning in the 4-stage pipeline: Pre-training → SFT → RL → Distillation."},
+  {a:"PII",f:"Personally Identifiable Information",d:"Any data that can identify an individual (names, emails, ID numbers). Must be redacted before embedding documents into a RAG vector index to prevent sensitive data from being permanently retrievable by semantic similarity."},
+  {a:"ROI",f:"Return on Investment",d:"Key AI deployment metric. Course benchmarks: 12–18 month payback period, 250–350% 3-year ROI, 307% for SAP Commerce Cloud B2B. Measured in business terms (cycle time, cost/transaction) not technical metrics (F1, accuracy)."},
+  {a:"RFQ",f:"Request for Quotation",d:"A formal document sent to suppliers asking for pricing on a specific product or service. Part of the Sourcing step in Source-to-Pay. AI agents automate RFQ generation and response analysis."},
+];
+const CHAPTER_SUMMARIES = [
+  {
+    id:"A", label:"Session 1 · Intro + Chapter 1", title:"Foundations & Enterprise AI Architecture",
+    keyPoints:[
+      {t:"The enterprise AI stack", b:"Data (passengers) → AI models (aircraft) → tools/protocols (gates/vehicles) → orchestration (air traffic control). Each layer enables the next."},
+      {t:"AI ⊃ ML ⊃ Deep Learning", b:"AI is the broadest field. ML ⊂ AI builds predictive models (Y = f(X)). Deep Learning ⊂ ML uses 3+ layer neural nets for unstructured data."},
+      {t:"ANI → AGI → ASI maturity arc", b:"ANI = task-specific (all 2026 systems). AGI = human-level continuous learning, cross-domain transfer (not yet achieved). ASI = superhuman across all domains (requires AGI first)."},
+      {t:"6 modules + 9 cross-functional flows", b:"Modules: Financial, Supply Chain, Procurement, Customer Relationship, HR, Sustainability. Flows include: Lead-to-Cash, Source-to-Pay, Hire-to-Retire, Record-to-Report, Design-to-Build, Forecast-to-Fulfill, Request-to-Service, Invoice-to-Pay, Issue-to-Resolution."},
+      {t:"SAP Joule as real-world example", b:"An AI co-pilot embedded across SAP's enterprise suite — illustrates how foundation models plug into the Digital Core as ANI, not AGI."},
+    ]
+  },
+  {
+    id:"B", label:"Session 1 · Chapter 3", title:"Transformer Architecture & LLM Foundations",
+    keyPoints:[
+      {t:"Pre-transformer arc: N-grams → Word2vec → Attention", b:"Word2vec proved words could be vectors where king − man + woman ≈ queen. Bahdanau Attention (2014) added selective weighting inside RNNs. GANs introduced generative modelling."},
+      {t:"'Attention Is All You Need' (2017)", b:"Vaswani et al. replaced recurrence with full self-attention, enabling parallelisation. All modern LLMs descend from this architecture."},
+      {t:"Encoder-only vs decoder-only", b:"Encoder-only (BERT) = understanding, classification. Decoder-only (GPT) = auto-regressive text generation. Encoder+Decoder = translation, summarisation."},
+      {t:"Tokenisation & token cost", b:"Sub-word tokenisation (BPE, SentencePiece) — not character-level. Token count = API cost + context window competition. A core enterprise design constraint."},
+      {t:"LoRA fine-tuning", b:"Injects small low-rank matrices (rank r ≪ d) into frozen model layers. Reduces trainable parameters by ~10,000× vs full fine-tuning. Makes domain adaptation economically viable."},
+      {t:"8-component deployment pipeline", b:"Data ingestion → Pre-processing → Embedding → Indexing → Query processing → Retrieval → Re-ranking → Generation. Each stage can fail independently."},
+    ]
+  },
+  {
+    id:"C", label:"Session 2 · Chapter 6", title:"Retrieval-Augmented Generation (RAG)",
+    keyPoints:[
+      {t:"Why RAG exists", b:"LLMs hallucinate facts not in training data. RAG retrieves relevant chunks at inference time — grounding generation in verifiable, citable, current knowledge without retraining."},
+      {t:"Chunking is the most important variable", b:"Chunk size, overlap, and boundary choice determine retrieval quality more than model size. Too large = noise; too small = missing context."},
+      {t:"9 RAG variants (must know all)", b:"Naive · Query Optimisation · Re-Ranking · Contextual Compression · Multi-Hop · Graph RAG · Agentic RAG · Hybrid Retrieval · Memory-Augmented. Each solves a different precision/recall/relational problem."},
+      {t:"Re-ranking adds 10–30% accuracy", b:"Initial vector retrieval returns top-50; a cross-encoder (e.g. Cohere Rerank, NV RerankQA) re-ranks to top-5. Two-stage is significantly more accurate than single-stage."},
+      {t:"4 security mechanisms", b:"Access-controlled retrieval (user permission gates) · Chunk-level audit trails · PII redaction before embedding · Output guardrails."},
+    ]
+  },
+  {
+    id:"D", label:"Session 2 · Chapters 7–8", title:"MCP & AI Agents",
+    keyPoints:[
+      {t:"Foundation model vs AI Agent", b:"FM: passive, single-turn, responds to prompts, no memory, no tool access. Agent: pursues goals, multi-step workflows, memory, tool access via MCP. The difference is between generating content and completing tasks."},
+      {t:"MCP = USB for AI tools", b:"Model Context Protocol provides a standardised discovery + invocation layer. Models find what tools are available (via manifests) and call them with structured inputs. Every call is logged and permission-gated."},
+      {t:"5-phase agent loop", b:"Perceive → Reason → Goal-set → Decide → Execute → repeat. Chapter 10 adds Orchestrate (coordinating sub-agents) as a 6th phase."},
+      {t:"4 memory types", b:"In-context (active window) · Episodic (past interaction logs) · Semantic (facts, knowledge graph) · Procedural (learned action sequences). Graph databases — not relational — support Semantic memory efficiently."},
+      {t:"HITL vs AITL", b:"Human-in-the-loop = human approves every action (high-risk, irreversible). AI-in-the-loop = AI executes, human reviews exceptions (e.g. 3-way match discrepancies in S2P)."},
+    ]
+  },
+  {
+    id:"E", label:"Session 3 · Chapters 9–10", title:"A2A Protocol & Agentic AI Frameworks",
+    keyPoints:[
+      {t:"MCP vs A2A (complementary)", b:"MCP = model-to-tool (one agent using one system). A2A = agent-to-agent (one agent delegating a sub-task to another specialised agent). They work together in enterprise multi-agent deployments."},
+      {t:"Agent Cards = agent discovery", b:"JSON-LD descriptors that advertise an agent's capabilities, input/output schemas, and trust requirements. The machine-readable 'business card' that makes A2A discovery work without manual configuration."},
+      {t:"A2A 3-layer spec + 6 goals", b:"Layers: Data model → Operations (create/update/cancel/status) → Protocol bindings (HTTP/REST, gRPC, WebSocket). Goals: Discoverability · Delegation · Trust · Observability · Interoperability · Fault tolerance."},
+      {t:"7 agentic frameworks", b:"AutoGen (Microsoft, conversation-based) · CrewAI (Crew→Agents→Tasks hierarchy) · LangChain / LangGraph (stateful cycles) · LlamaIndex (data-centric, RAG-heavy) · Semantic Kernel (Microsoft enterprise .NET/Python) · LangChain4j (JVM/Java)."},
+      {t:"A2A risks: emergent behaviour & governance", b:"Multi-agent systems can produce unintended outcomes. Each agent-to-agent call is an attack vector. Mutual authentication + scoped permissions + rate limiting are mandatory in production. Audit trails are critical for attribution."},
+    ]
+  },
+  {
+    id:"F", label:"Session 3–4 · Chapters 11–12", title:"Research AI & Reasoning AI (LRMs)",
+    keyPoints:[
+      {t:"Research-grade AI: 7 building blocks + 6 criteria", b:"Building blocks: Foundation model · Planning · RAG · Tool use · Memory · Multi-agent · Evaluation & verification. Criteria: Multi-step reasoning · Source attribution · Self-evaluation · Dynamic retrieval · Tool orchestration · Uncertainty quantification."},
+      {t:"Two research architecture paradigms", b:"ChatGPT-style (agentic loop): model drives retrieval — flexible but slower. Perplexity-style (retrieval-first): retrieve then generate — faster and more predictable. 2026 trend: hybrid combining both."},
+      {t:"LRM vs LLM", b:"LLM = reflex/pattern-match, single-pass generation. LRM = deliberative thinking layer added at inference time. LRMs spend more compute generating internal reasoning chains (thinking tokens) before answering."},
+      {t:"LRM 4-stage training pipeline", b:"Pre-training (general knowledge) → Supervised Fine-Tuning (domain) → Reinforcement Learning (rewards correct answers AND coherent reasoning chains) → Knowledge Distillation (compress into smaller deployable model)."},
+      {t:"Enterprise cascade pattern", b:"Route by complexity: GPT-4o mini (simple, fast, cheap) → GPT-4o (complex) → o3-mini (edge cases needing deep reasoning). Saves cost while preserving quality. Apple research caveat: LRM accuracy collapses beyond a complexity threshold."},
+    ]
+  },
+  {
+    id:"G", label:"Session 4–5 · Chapters 13–14", title:"End-to-End Business AI & The Road to AGI",
+    keyPoints:[
+      {t:"AI Assistant vs AI Agent", b:"Assistant: responds to queries, surfaces information, drafts content — human remains the actor. Agent: executes process steps autonomously — logs actions, triggers approvals, escalates exceptions. The distinction determines governance model."},
+      {t:"Source-to-Pay as the capstone", b:"S2P = high volume + rule-bounded + cross-module (Finance + Supply + Procurement) + structured documents (PO, GRN, invoice) + clear compliance. 3-way match automation: 60–80% cycle time reduction."},
+      {t:"Process selection criteria (5)", b:"High volume · Rule-bounded decisions · Structured data availability · Clear success metrics · Reversible or low-risk actions. S2P scores on all five."},
+      {t:"Measure business outcomes, not model metrics", b:"Business metrics: cycle time reduction, cost per transaction, error rate. NOT F1 score or test accuracy — those are internal proxies. Communicate in the language of business stakeholders."},
+      {t:"AGI trajectory & governance", b:"MCP, A2A, agentic frameworks are waypoints on the AGI trajectory — not endpoints. 'Cognitive work as commodity': if intelligence is commoditised like compute, the economics of knowledge-intensive industries shift. Governance must develop at the same pace as capability."},
+    ]
+  },
 ];
 
-// =====================
-// STATE
-// =====================
-let mode="all", difficulty="All";
+const SECTIONS = {
+  A:"Foundations & Architecture", B:"Transformers & LLMs", C:"RAG",
+  D:"MCP & AI Agents", E:"A2A & Agentic Frameworks", F:"Research & Reasoning AI",
+  G:"Business AI & AGI", G2:"Extended: Foundations", G3:"Extended: Agents & Business"
+};
+
+// Concept explanations keyed by section — used to enrich the explanation box
+const CONCEPTS = {
+  A: "Foundations & Enterprise Architecture: AI is a decision-making tool. The enterprise stack = Data → Models → Tools/Protocols → Orchestration. Maturity arc: ANI (task-specific, all 2026 systems) → AGI (human-level, not achieved) → ASI (superhuman, hypothetical). 6 functional modules; 9 cross-functional flows.",
+  B: "Transformer Architecture & LLMs: Self-attention replaced recurrence ('Attention Is All You Need', 2017). Encoder-only (BERT) = understanding; Decoder-only (GPT) = generation. Sub-word tokenisation (BPE) — token count is a cost constraint. LoRA = inject small low-rank matrices, reducing trainable params by ~10,000×. 8-stage deployment pipeline.",
+  C: "RAG (Retrieval-Augmented Generation): Retrieves document chunks at inference time to ground LLM output. Chunking strategy is the single most important quality variable. 9 variants: Naive, Query Optimisation, Re-Ranking (+10–30% accuracy), Contextual Compression, Multi-Hop, Graph, Agentic, Hybrid, Memory-Augmented. PII must be redacted before embedding.",
+  D: "MCP & AI Agents: Foundation models are passive (single-turn, no memory, no tools). Agents pursue goals through multi-step loops (Perceive→Reason→Goal-set→Decide→Execute). MCP = USB for AI tools — standardised tool discovery and invocation. 4 memory types: in-context, episodic, semantic (graph), procedural. HITL = human approves every action; AITL = AI executes, human reviews exceptions.",
+  E: "A2A Protocol & Agentic Frameworks: A2A enables agent-to-agent delegation (agent cards = JSON-LD machine-readable capabilities). 3-layer spec: Data model → Operations → Protocol bindings. 6 goals: Discoverability, Delegation, Trust, Observability, Interoperability, Fault tolerance. 7 frameworks: AutoGen (Microsoft, conversation), CrewAI (Crew→Agents→Tasks), LangChain/LangGraph (stateful cycles), LlamaIndex (data-centric), Semantic Kernel (Microsoft enterprise), LangChain4j (JVM/Java).",
+  F: "Research AI & LRMs: Research-grade AI requires 7 building blocks and 6 criteria. Two paradigms: retrieval-first (Perplexity-style, faster) vs agentic loop (ChatGPT-style, more flexible). LRMs add a deliberative thinking layer at inference time. 4-stage training: Pre-training → SFT → RL (rewards correct answers AND coherent reasoning) → Knowledge Distillation (compress to smaller deployable model). Apple finding: accuracy collapses beyond a complexity threshold.",
+  G: "End-to-End Business AI & AGI: AI Assistant = responds to queries, human acts. AI Agent = executes steps autonomously, human reviews exceptions. S2P (Source-to-Pay) = Requisition→Sourcing→Supplier Selection→PO→Goods Receipt→3-Way Match→Payment→Supplier Review. 60–80% cycle time reduction on 3-way match. Measure business metrics (cycle time, cost/transaction), not technical metrics (F1, accuracy). MCP/A2A are waypoints on the AGI trajectory, not endpoints.",
+  G2: "Extended Foundations: Word2vec encodes semantic meaning geometrically. RAG does not retrain the LLM — it adds to the vector index. FAISS is a library, not a managed service. OpenSearch natively supports hybrid BM25 + dense vector search.",
+  G3: "Extended Agents & Business: AutoGen = Microsoft conversation-based framework. Record-to-Report covers financial period-end close. Cascade pattern = route by complexity, not always to the biggest model. PII redaction before embedding prevents permanent sensitive data exposure in vector indexes."
+};
+
+// Per-option explanations keyed by "section:questionPartialKey" — for richer answer breakdown
+// We enrich the explanation at render time using a heuristic approach
+
+// ══ STATE ══
+let mode="ten", qtype="exam", diff="All";
 let selSections=new Set(Object.keys(SECTIONS));
 let gameQ=[],idx=0,score=0,streak=0,bestStreak=0,answers=[];
 let multiSel=new Set();
+let progress={}; // {sectionId: {total,correct,sessions}}
 
-function switchTab(tabId,btn){
-  document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));
-  document.querySelectorAll('.tabbar-btn').forEach(b=>b.classList.remove('active'));
-  document.getElementById(tabId).classList.add('active');
+// ══ INIT ══
+function init(){
+  loadProgress();
+  buildPills();
+  buildCheatSheet();
+  buildSummary();
+  renderProgressTracker();
+  document.getElementById('home-done').textContent=totalAnswered();
+}
+
+function totalAnswered(){
+  return Object.values(progress).reduce((s,v)=>s+(v.total||0),0);
+}
+
+// ══ TAB SWITCHING ══
+function switchTab(id,btn){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.tbb').forEach(b=>b.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
   btn.classList.add('active');
 }
+
+// ══ HOME CONTROLS ══
 function selMode(el){
-  document.querySelectorAll('.mode-card').forEach(c=>c.classList.remove('sel'));
+  document.querySelectorAll('.mc').forEach(c=>c.classList.remove('sel'));
   el.classList.add('sel'); mode=el.dataset.mode;
   document.getElementById('section-picker').style.display=mode==='section'?'block':'none';
 }
-function selDiff(el){
-  document.querySelectorAll('.diff-btn').forEach(b=>b.classList.remove('sel-all','sel-easy','sel-medium','sel-hard'));
-  difficulty=el.dataset.diff;
-  const m={All:'sel-all',Easy:'sel-easy',Medium:'sel-medium',Hard:'sel-hard'};
-  el.classList.add(m[difficulty]);
+function selType(el){
+  document.querySelectorAll('.tt-btn').forEach(b=>b.classList.remove('sel'));
+  el.classList.add('sel'); qtype=el.dataset.type;
 }
-(function buildPills(){
+function selDiff(el){
+  document.querySelectorAll('.dp').forEach(b=>b.classList.remove('sel-all','sel-easy','sel-med','sel-hard'));
+  diff=el.dataset.d;
+  const m={All:'sel-all',Easy:'sel-easy',Medium:'sel-med',Hard:'sel-hard'};
+  el.classList.add(m[diff]);
+}
+
+function buildPills(){
   const el=document.getElementById('section-pills');
   Object.entries(SECTIONS).forEach(([k,v])=>{
     const p=document.createElement('button');
-    p.className='pill sel';p.textContent=v;p.dataset.s=k;
+    p.className='spill sel';p.textContent=v;p.dataset.s=k;
     p.onclick=()=>{p.classList.toggle('sel');if(p.classList.contains('sel'))selSections.add(k);else selSections.delete(k)};
     el.appendChild(p);
   });
-})();
+}
+
+// ══ GAME FLOW ══
 function shuffle(a){return a.slice().sort(()=>Math.random()-.5)}
-function startGame(){
+
+function startGame(preselect){
+  if(preselect) {
+    selSections=new Set(preselect);
+    // switch mode to section
+    document.querySelectorAll('.mc').forEach(c=>c.classList.remove('sel'));
+    document.querySelector('[data-mode="section"]').classList.add('sel');
+    mode='section';
+    document.getElementById('section-picker').style.display='block';
+    // update pill UI
+    document.querySelectorAll('.spill').forEach(p=>{
+      if(selSections.has(p.dataset.s))p.classList.add('sel');else p.classList.remove('sel');
+    });
+  }
+
   let pool=Q.slice();
-  if(mode==='quick')pool=shuffle(Q);
-  else if(mode==='hard')pool=Q.filter(q=>q.d==='Hard');
-  else if(mode==='section')pool=Q.filter(q=>selSections.has(q.s));
-  if(difficulty!=='All')pool=pool.filter(q=>q.d===difficulty);
-  if(mode==='quick')pool=pool.slice(0,20);
-  if(!pool.length){alert('No questions match your filters. Try different settings.');return}
-  gameQ=shuffle(pool);idx=0;score=0;streak=0;bestStreak=0;answers=[];
+  if(mode==='section') pool=Q.filter(q=>selSections.has(q.s));
+  if(diff!=='All') pool=pool.filter(q=>q.d===diff);
+  // type filter: exam=all current Q, learn=not implemented yet (future), both=all
+  if(qtype==='learn') pool=pool.filter(q=>q.learn===true);
+  else if(qtype==='exam') pool=pool.filter(q=>!q.learn);
+  // 'both' = no filter, keep all
+
+  pool=shuffle(pool);
+  if(mode==='ten') pool=pool.slice(0,10);
+  else if(mode==='quick') pool=pool.slice(0,20);
+
+  if(!pool.length){alert('No questions match your filters.');return}
+  gameQ=pool;idx=0;score=0;streak=0;bestStreak=0;answers=[];
   showScreen('quiz');renderQ();
 }
+
 function renderQ(){
   if(idx>=gameQ.length){showResults();return}
   const q=gameQ[idx];
   const pct=Math.round(idx/gameQ.length*100);
   document.getElementById('prog').style.width=pct+'%';
-  document.getElementById('q-count').textContent=(idx+1)+' / '+gameQ.length;
+  document.getElementById('qcount').textContent=(idx+1)+' / '+gameQ.length;
   document.getElementById('hud-score').textContent=score;
   document.getElementById('hud-streak').textContent=streak;
   document.getElementById('hud-left').textContent=gameQ.length-idx;
-  const dC={Easy:'chip-easy',Medium:'chip-medium',Hard:'chip-hard'}[q.d];
+  const dC={Easy:'chip-easy',Medium:'chip-med',Hard:'chip-hard'}[q.d];
   const tL={TF:'True / False',MCQ:'Multiple choice',MULTI:'Multi-select'}[q.t];
   document.getElementById('q-meta').innerHTML=
-    `<span class="chip ${dC}">${q.d}</span><span class="chip chip-type">${tL}</span><span class="chip chip-section">${SECTIONS[q.s]||q.s}</span>`;
+    `<span class="chip ${dC}">${q.d}</span><span class="chip chip-type">${tL}</span><span class="chip chip-sec">${SECTIONS[q.s]||q.s}</span>`;
   document.getElementById('q-text').textContent=q.q;
-  document.getElementById('feedback-area').innerHTML='';
+  document.getElementById('exp-area').innerHTML='';
   document.getElementById('next-area').innerHTML='';
   multiSel.clear();
   const area=document.getElementById('answer-area');
   if(q.t==='TF'){
     area.innerHTML=`<div class="tf-row"><button class="tf-btn" onclick="answerTF('TRUE',this)">True</button><button class="tf-btn" onclick="answerTF('FALSE',this)">False</button></div>`;
-  }else if(q.t==='MCQ'){
-    area.innerHTML='<div class="opts-list">'+q.o.map((o,i)=>`<button class="opt" onclick="answerMCQ('${String.fromCharCode(65+i)}',this)">${o}</button>`).join('')+'</div>';
-  }else{
-    area.innerHTML=`<div class="multi-hint">Select all correct answers, then tap Submit</div><div class="opts-list">${q.o.map((o,i)=>`<button class="opt" data-val="${String.fromCharCode(65+i)}" onclick="toggleMulti('${String.fromCharCode(65+i)}',this)">${o}</button>`).join('')}</div><button class="btn-primary" id="msub" style="opacity:.4;pointer-events:none" onclick="submitMulti()">Submit answer</button><div class="gap"></div>`;
+  } else if(q.t==='MCQ'){
+    area.innerHTML='<div class="opts">'+q.o.map((o,i)=>`<button class="opt" onclick="answerMCQ('${String.fromCharCode(65+i)}',this)">${o}</button>`).join('')+'</div>';
+  } else {
+    area.innerHTML=`<div class="mhint">Select all correct answers, then tap Submit</div><div class="opts">${q.o.map((o,i)=>`<button class="opt" data-val="${String.fromCharCode(65+i)}" onclick="toggleMulti('${String.fromCharCode(65+i)}',this)">${o}</button>`).join('')}</div><button class="btn btn-acc" id="msub" style="opacity:.4;pointer-events:none" onclick="submitMulti()">Submit answer</button><div class="gap"></div>`;
   }
 }
+
 function answerTF(val,btn){
   const q=gameQ[idx];const ok=val===q.a;
   document.querySelectorAll('.tf-btn').forEach(b=>{b.classList.add('disabled');if(b.textContent.toUpperCase()===q.a)b.classList.add('correct');else if(b===btn&&!ok)b.classList.add('wrong')});
@@ -677,78 +829,250 @@ function submitMulti(){
   document.getElementById('msub').style.display='none';
   resolve(ok,q,[...us].join(', '));idx++;renderNext();
 }
+
 function resolve(ok,q,userAns){
   score+=ok?10:0;streak=ok?streak+1:0;bestStreak=Math.max(bestStreak,streak);
   if(ok&&streak>1)showToast('🔥 '+streak+' in a row!');
-  answers.push({s:q.s,d:q.d,q:q.q,your:userAns||'—',correct:q.a,ok,exp:q.e});
-  document.getElementById('feedback-area').innerHTML=
-    `<div class="feedback ${ok?'ok':'bad'}"><div class="feedback-title">${ok?'✓ Correct':'✗ Incorrect'}</div><div class="feedback-ans">Answer: ${q.a}</div>${q.e}</div>`;
-  document.getElementById('hud-score').textContent=score;document.getElementById('hud-streak').textContent=streak;
+  answers.push({s:q.s,d:q.d,q:q.q,your:userAns||'—',correct:q.a,ok,exp:q.e,opts:q.o,concept:CONCEPTS[q.s]||''});
+  updateProgress(q.s,ok);
+  showRichExp(ok,q);
+  document.getElementById('hud-score').textContent=score;
+  document.getElementById('hud-streak').textContent=streak;
 }
+
+function showRichExp(ok,q){
+  const verdict=ok?'✓ Correct':'✗ Incorrect';
+  const vClass=ok?'ok':'bad';
+  const concept=CONCEPTS[q.s]||'';
+
+  // Parse options for per-option breakdown (MCQ and MULTI only)
+  let optBreakdown='';
+  if(q.o && q.o.length){
+    const correctSet=new Set(q.a.split(', ').map(s=>s.trim()));
+    // Parse the existing explanation to extract per-option clues
+    const expText=q.e||'';
+    const rows=q.o.map((optText,i)=>{
+      const letter=String.fromCharCode(65+i);
+      const isCorrect=correctSet.has(letter);
+      const badgeClass=isCorrect?'exp-ok-badge':'exp-bad-badge';
+      const icon=isCorrect?'✓':'✗';
+      // Extract why from the explanation text where possible
+      let why='';
+      // Look for mentions of this option letter in the explanation
+      const re=new RegExp('\\b'+letter+'\\b[^A-Z)]{0,200}');
+      const match=expText.match(re);
+      if(match) why=match[0].replace(/^[A-Z]\s*/,'').trim();
+      else why=isCorrect?'Correct — see explanation below.':'Incorrect — see explanation below.';
+      return `<div class="exp-opt-row"><div class="exp-opt-badge ${badgeClass}">${icon}</div><div class="exp-opt-text"><strong style="color:${isCorrect?'var(--green)':'var(--red)'}">${letter})</strong> ${why}</div></div>`;
+    }).join('');
+    optBreakdown=`<div class="exp-options"><div class="exp-options-label">Why each option</div>${rows}</div>`;
+  }
+
+  document.getElementById('exp-area').innerHTML=`
+    <div class="exp-box">
+      <div class="exp-verdict ${vClass}">${verdict}</div>
+      <div class="exp-concept">
+        <div class="exp-concept-label">Key concept</div>
+        <div class="exp-concept-text">${concept.split('.')[0]}.</div>
+      </div>
+      <div class="exp-answer">
+        <div class="exp-answer-label">Correct answer &amp; why</div>
+        <div class="exp-answer-text"><strong>Answer: ${q.a}</strong><br>${q.e}</div>
+      </div>
+      ${optBreakdown}
+    </div>`;
+}
+
 function renderNext(){
   const last=idx>=gameQ.length;
-  document.getElementById('next-area').innerHTML=`<button class="btn-primary" onclick="renderQ()">${last?'See results →':'Next →'}</button>`;
+  document.getElementById('next-area').innerHTML=`<button class="btn btn-acc" onclick="renderQ()">${last?'See results →':'Next →'}</button>`;
 }
+
+// ══ RESULTS ══
 function showResults(){
   showScreen('results');
   const total=answers.length,correct=answers.filter(a=>a.ok).length;
   const pct=total?Math.round(correct/total*100):0;
   const grade=pct>=90?'A+':pct>=80?'A':pct>=70?'B':pct>=60?'C':pct>=50?'D':'F';
-  const msgs={'A+':'Perfect! Exam ready.','A':'Excellent work!','B':'Great — almost there!','C':'Good progress. Keep reviewing.','D':'Keep studying — you can do it.','F':'More practice needed. Try again!'};
+  const msgs={'A+':'Perfect! Exam ready.','A':'Excellent work!','B':'Great — almost there!','C':'Good progress. Keep reviewing.','D':'Keep studying — you can do it.','F':'More practice needed.'};
   document.getElementById('r-grade').textContent=grade;
   document.getElementById('r-sub').textContent=`${correct} / ${total} correct`;
-  document.getElementById('r-msg').textContent=msgs[grade]||msgs.D;
-  document.getElementById('r-correct').textContent=correct;document.getElementById('r-wrong').textContent=total-correct;
-  document.getElementById('r-streak').textContent=bestStreak;document.getElementById('r-pct').textContent=pct+'%';
-  buildChapterReport();buildReviewList();saveScore(pct,grade,correct,total);
+  document.getElementById('r-msg').textContent=msgs[grade];
+  document.getElementById('r-correct').textContent=correct;
+  document.getElementById('r-wrong').textContent=total-correct;
+  document.getElementById('r-streak').textContent=bestStreak;
+  document.getElementById('r-pct').textContent=pct+'%';
+  buildChapterReport();buildReviewList();renderProgressTracker();
+  document.getElementById('home-done').textContent=totalAnswered();
 }
+
 function buildChapterReport(){
   const stats={};
   answers.forEach(a=>{if(!stats[a.s])stats[a.s]={total:0,correct:0};stats[a.s].total++;if(a.ok)stats[a.s].correct++});
   const sorted=Object.entries(stats).sort((a,b)=>(a[1].correct/a[1].total)-(b[1].correct/b[1].total));
   const el=document.getElementById('chapter-report');
-  if(!sorted.length){el.innerHTML='<p class="muted">No data yet.</p>';return}
+  if(!sorted.length){el.innerHTML='';return}
   const weak=sorted.filter(([,v])=>v.correct/v.total<0.6);
-  let html=weak.length
-    ?`<div style="background:var(--red-soft);border:1px solid var(--red-border);border-radius:var(--r);padding:14px;margin-bottom:14px"><div style="font-size:13px;font-weight:700;color:var(--red);margin-bottom:6px">Chapters to study</div><div style="font-size:13px;color:#f0a0a8;line-height:1.6">${weak.map(([s])=>SECTIONS[s]||s).join(' &middot; ')}</div><div style="font-size:12px;color:var(--muted);margin-top:8px">You scored below 60% in these chapters. Use <strong style="color:var(--text)">By chapter</strong> mode to drill them specifically.</div></div>`
-    :`<div style="background:var(--green-soft);border:1px solid var(--green-border);border-radius:var(--r);padding:14px;margin-bottom:14px"><div style="font-size:13px;font-weight:700;color:var(--green);margin-bottom:4px">Strong performance across all chapters</div><div style="font-size:12px;color:var(--muted)">You scored 60%+ in every chapter attempted. Keep it up!</div></div>`;
+  let html='';
+  if(weak.length){
+    html+=`<div style="background:var(--rsoft);border:1px solid var(--rborder);border-radius:var(--r);padding:13px;margin-bottom:12px">
+      <div style="font-size:13px;font-weight:700;color:var(--red);margin-bottom:5px">Chapters to study</div>
+      <div style="font-size:12px;color:#f0a0a8;line-height:1.6;margin-bottom:8px">${weak.map(([s])=>SECTIONS[s]||s).join(' · ')}</div>
+      <button class="study-btn" onclick="drillWeak(${JSON.stringify(weak.map(([s])=>s))})">→ Drill these chapters now</button>
+    </div>`;
+  } else {
+    html+=`<div style="background:var(--gsoft);border:1px solid var(--gborder);border-radius:var(--r);padding:13px;margin-bottom:12px"><div style="font-size:13px;font-weight:700;color:var(--green)">Strong performance across all chapters</div></div>`;
+  }
   sorted.forEach(([s,v])=>{
     const p=Math.round(v.correct/v.total*100);
     const bc=p>=70?'var(--green)':p>=50?'var(--amber)':'var(--red)';
-    const ns=p<60;
-    html+=`<div class="cr-item ${ns?'cr-need':'cr-ok'}"><div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:4px"><div><div class="cr-title">${SECTIONS[s]||s}</div><div class="cr-meta">${v.correct} / ${v.total} correct</div></div><div style="text-align:right"><span class="cr-pct" style="color:${bc}">${p}%</span><div style="margin-top:4px"><span class="study-badge ${ns?'badge-study':'badge-good'}">${ns?'Study this':'Good'}</span></div></div></div><div class="cr-bar-wrap"><div class="cr-bar" style="width:${p}%;background:${bc}"></div></div></div>`;
+    html+=`<div class="cr-item ${p<60?'cr-need':'cr-ok'}">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start">
+        <div><div class="cr-title">${SECTIONS[s]||s}</div><div class="cr-meta">${v.correct} / ${v.total} correct</div></div>
+        <span style="font-size:14px;font-weight:700;color:${bc}">${p}%</span>
+      </div>
+      <div class="cr-bar-wrap"><div class="cr-bar" style="width:${p}%;background:${bc}"></div></div>
+    </div>`;
   });
   el.innerHTML=html;
 }
+
+function drillWeak(sections){
+  showScreen('home');
+  startGame(sections);
+}
+
 function buildReviewList(){
-  document.getElementById('review-list').innerHTML=answers.map((a,i)=>`<div class="review-item"><div class="review-head" onclick="toggleRev(${i})"><div class="r-icon ${a.ok?'r-ok2':'r-bad'}">${a.ok?'✓':'✗'}</div><div class="r-qtext">${a.q}</div></div><div class="review-body" id="rv${i}"><div class="rev-correct">Correct: ${a.correct}</div>${!a.ok?`<div class="rev-your">Your answer: ${a.your}</div>`:''} ${a.exp}</div></div>`).join('');
+  document.getElementById('review-list').innerHTML=answers.map((a,i)=>`
+    <div class="rev-item">
+      <div class="rev-head" onclick="toggleRev(${i})">
+        <div class="r-icon ${a.ok?'ri-ok':'ri-bad'}">${a.ok?'✓':'✗'}</div>
+        <div class="r-qtext">${a.q}</div>
+      </div>
+      <div class="rev-body" id="rv${i}">
+        <div class="rev-correct">Correct: ${a.correct}</div>
+        ${!a.ok?`<div class="rev-yours">Your answer: ${a.your}</div>`:''}
+        ${a.exp}
+      </div>
+    </div>`).join('');
 }
 function toggleRev(i){document.getElementById('rv'+i).classList.toggle('open')}
-function saveScore(pct,grade,correct,total){
-  try{const hs=JSON.parse(localStorage.getItem('baa_hs')||'[]');hs.unshift({pct,grade,correct,total,date:new Date().toLocaleDateString()});localStorage.setItem('baa_hs',JSON.stringify(hs.slice(0,5)));renderScores()}catch(e){}
+
+// ══ PROGRESS TRACKING ══
+function loadProgress(){
+  try{progress=JSON.parse(localStorage.getItem('baa_progress')||'{}')}catch(e){progress={}}
 }
-function renderScores(){
-  try{
-    const hs=JSON.parse(localStorage.getItem('baa_hs')||'[]');
-    const wrap=document.getElementById('scores-wrap');
-    if(!hs.length){wrap.innerHTML='';return}
-    wrap.innerHTML='<div class="gap-lg"></div><div class="label" style="margin-bottom:10px">Recent scores</div>'+hs.map(s=>`<div class="score-row"><span class="muted">${s.date}</span><span>${s.correct}/${s.total}</span><span style="font-weight:600;color:var(--accent)">${s.grade} &middot; ${s.pct}%</span></div>`).join('');
-  }catch(e){}
+function saveProgress(){
+  try{localStorage.setItem('baa_progress',JSON.stringify(progress))}catch(e){}
 }
-renderScores();
+function updateProgress(section,ok){
+  if(!progress[section])progress[section]={total:0,correct:0,sessions:0};
+  progress[section].total++;
+  if(ok)progress[section].correct++;
+  saveProgress();
+}
+function clearProgress(){
+  if(!confirm('Reset all chapter progress?'))return;
+  progress={};saveProgress();renderProgressTracker();
+  document.getElementById('home-done').textContent=0;
+}
+function renderProgressTracker(){
+  const el=document.getElementById('progress-tracker');
+  const entries=Object.entries(SECTIONS);
+  if(!entries.length){el.innerHTML='';return}
+  el.innerHTML=entries.map(([s,name])=>{
+    const p=progress[s]||{total:0,correct:0};
+    if(p.total===0){
+      return `<div class="ps-item">
+        <div class="ps-top"><div class="ps-name">${name}</div><span class="muted" style="font-size:11px">Not started</span></div>
+        <div class="ps-bar"><div class="ps-fill" style="width:0%;background:var(--muted2)"></div></div>
+      </div>`;
+    }
+    const pct=Math.round(p.correct/p.total*100);
+    const bc=pct>=70?'var(--green)':pct>=50?'var(--amber)':'var(--red)';
+    return `<div class="ps-item">
+      <div class="ps-top"><div class="ps-name">${name}</div><div class="ps-pct" style="color:${bc}">${pct}%</div></div>
+      <div class="ps-bar"><div class="ps-fill" style="width:${pct}%;background:${bc}"></div></div>
+      <div class="ps-meta">${p.correct} / ${p.total} correct across all sessions</div>
+    </div>`;
+  }).join('');
+}
+
+// ══ CHEAT SHEET ══
+let csSection='A';
+function buildCheatSheet(){
+  // Switcher
+  const sw=document.getElementById('cs-switcher');
+  sw.innerHTML=Object.entries(SECTIONS).map(([k,v])=>
+    `<button class="ch-btn${k==='A'?' sel':''}" data-s="${k}" onclick="selCS('${k}',this)">${v}</button>`
+  ).join('')+'<button class="ch-btn" data-s="acro" onclick="selCS(\'acro\',this)">Acronyms</button>';
+  renderCS('A');
+}
+function selCS(s,btn){
+  csSection=s;
+  document.querySelectorAll('#cs-switcher .ch-btn').forEach(b=>b.classList.remove('sel'));
+  btn.classList.add('sel');
+  renderCS(s);
+}
+function renderCS(s){
+  const el=document.getElementById('cs-content');
+  if(s==='acro'){
+    el.innerHTML='<div class="cs-section"><div class="cs-sec-label">Key Acronyms & Definitions</div>'+
+      ACRONYMS.map(a=>`<div class="acro-card"><div class="acro-abbr">${a.a}</div><div><div class="acro-full">${a.f}</div><div class="acro-def">${a.d}</div></div></div>`).join('')+
+      '</div>';
+    return;
+  }
+  const chap=CHAPTER_SUMMARIES.find(c=>c.id===s);
+  if(!chap){el.innerHTML='';return}
+  el.innerHTML=`<div class="cs-section">
+    <div class="cs-sec-label">${chap.label}</div>
+    <div class="cs-card">
+      <div class="cs-card-title">${chap.title}</div>
+      <ul class="cs-bullets">
+        ${chap.keyPoints.map(p=>`<li><strong>${p.t}:</strong> ${p.b}</li>`).join('')}
+      </ul>
+    </div>
+  </div>`;
+}
+
+// ══ SUMMARY ══
+let sumSection='A';
+function buildSummary(){
+  const sw=document.getElementById('sum-switcher');
+  sw.innerHTML=CHAPTER_SUMMARIES.map((c,i)=>
+    `<button class="ch-btn${i===0?' sel':''}" onclick="selSum('${c.id}',this)">${c.title}</button>`
+  ).join('');
+  renderSum('A');
+}
+function selSum(s,btn){
+  sumSection=s;
+  document.querySelectorAll('#sum-switcher .ch-btn').forEach(b=>b.classList.remove('sel'));
+  btn.classList.add('sel');
+  renderSum(s);
+}
+function renderSum(s){
+  const el=document.getElementById('sum-content');
+  const chap=CHAPTER_SUMMARIES.find(c=>c.id===s);
+  if(!chap){el.innerHTML='';return}
+  el.innerHTML=`<div class="sum-card">
+    <div class="sum-session">${chap.label}</div>
+    <div class="sum-title">${chap.title}</div>
+    ${chap.keyPoints.map(p=>`<div class="sum-point"><div class="sum-pt">${p.t}</div><div class="sum-pb">${p.b}</div></div>`).join('')}
+  </div>`;
+}
+
+// ══ NAVIGATION ══
 function showScreen(id){
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
-  document.getElementById('quiz-tab').scrollTop=0;
+  document.getElementById('tab-q').scrollTop=0;
 }
 function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),1800)}
 function confirmQuit(){document.getElementById('quit-overlay').classList.add('show')}
 function closeQuit(){document.getElementById('quit-overlay').classList.remove('show')}
 function doQuit(){closeQuit();showScreen('home')}
-(function buildSummary(){
-  document.getElementById('acronym-grid').innerHTML=ACRONYMS.map(a=>`<div class="acro-card"><div class="acro-abbr">${a.a}</div><div class="acro-body"><div class="acro-full">${a.f}</div><div class="acro-def">${a.d}</div></div></div>`).join('');
-  document.getElementById('chapter-summaries').innerHTML=CHAPTER_SUMMARIES.map(c=>`<div class="s-card" style="margin-bottom:12px"><div style="font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--accent);margin-bottom:2px">${c.label}</div><div class="s-card-title" style="font-size:16px;margin-bottom:10px">${c.title}</div>${c.keyPoints.map(p=>`<div style="margin-bottom:10px;padding-bottom:10px;border-bottom:1px solid var(--border)"><div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:3px">${p.t}</div><div class="s-card-body">${p.b}</div></div>`).join('')}</div>`).join('');
-})();
+
+init();
 </script>
 </body>
 </html>
